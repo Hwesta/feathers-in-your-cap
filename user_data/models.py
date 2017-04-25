@@ -1,0 +1,56 @@
+from django.db import models
+from django.conf import settings
+from django.contrib.gis.db import models as gismodels
+
+
+# Static info - this may be moved to ebird data dump app
+
+class Species(models.Model):
+    common_name = models.TextField()  # Use English IOC info
+    scientific_name = models.TextField(unique=True)
+    taxonomic_order = models.TextField()
+
+    def __str__(self):
+        return '{s.scientific_name} ({s.common_name})'.format(s=self)
+
+class Location(gismodels.Model):
+    coords = gismodels.PointField(srid=4326)  # Lon & Lat
+    state_province = models.TextField(help_text='State or province')  # Format: Country-state.  What if this is just the country?
+    county = models.TextField(blank=True)  # County name
+    locality = models.TextField(blank=True)  # Location name
+
+    def __str__(self):
+        return '{s.locality} ({s.coords})'.format(s=self)
+
+
+# Personal data
+
+class Checklist(models.Model):
+    id = models.IntegerField(primary_key=True)  # Strip the leading S off the checklist ID
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    location = models.ForeignKey('Location')
+    complete_checklist = models.BooleanField()
+    start_date_time = models.DateTimeField()
+    checklist_comments = models.TextField(blank=True)
+    number_of_observers = models.PositiveIntegerField(null=True, blank=True)
+    protocol = models.TextField()  # Later, choices?
+    duration = models.PositiveIntegerField(help_text='Duration in minutes')
+    distance = models.DecimalField(decimal_places=6, max_digits=16, help_text='Distance in km')
+    area = models.DecimalField(decimal_places=6, max_digits=16, help_text='Area covered in ha')
+
+    def __str__(self):
+        return 'Checklist at {s.location.locality} {s.start_date_time}'.format(s=self)
+
+
+class Observation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)  # Not required because checklist has it, but makes queries easier
+    # Personal data doesn't come with the ebird observation ID
+    checklist = models.ForeignKey('Checklist')
+    species = models.ForeignKey('Species')
+    count = models.PositiveIntegerField(null=True)
+    presence = models.BooleanField()  # True if count >0 or X
+    species_comments = models.TextField()
+    breeding_atlas_code = models.TextField(blank=True)  # Use choices
+
+    def __str__(self):
+        return '{s.user} observed {s.count} {s.species} on {s.checklist.start_date_time}'.format(s=self)
