@@ -3,7 +3,7 @@ from django.contrib.gis.db import models
 
 class Observation(models.Model):
     checklist = models.ForeignKey('Checklist')
-    observation_id = models.IntegerField(primary_key=True)
+    observation = models.IntegerField(primary_key=True)
     number_observed = models.IntegerField(null=True, blank=True)
     is_x = models.BooleanField()
     age_sex = models.TextField()  # This is a first pass, this field seems like it's freeform text of structured data.
