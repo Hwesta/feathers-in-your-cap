@@ -61,6 +61,7 @@ class Checklist(models.Model):
     reason = models.TextField()
     protocol = models.ForeignKey('Protocol', null=True, blank=True)
     project = models.ForeignKey('Project', null=True, blank=True)
+    atlas_block = models.ForeignKey('AtlasBlock', null=True, blank=True)
 
     def __str__(self):
         return "{}, group id: {}: {}".format(self.checklist, self.group_id, self.start_date_time)
@@ -218,3 +219,10 @@ class USFWS(models.Model):
 
     def __str__(self):
         return "{}".format(self.usfws_code)
+
+
+class AtlasBlock(models.Model):
+    atlas_block = models.TextField(primary_key=True)
+
+    def __str__(self):
+        return "{}".format(self.atlas_block)
