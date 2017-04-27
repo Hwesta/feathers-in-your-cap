@@ -8,6 +8,8 @@ from decimal import Decimal
 import re
 import sys
 
+import django.db.transaction
+
 from django.conf import settings
 #Setup so that I can use the the model outside of Django itself.
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings.development'
@@ -16,6 +18,9 @@ django.setup()
 from ebird_data.models import *
 
 #csv.field_size_limit(sys.maxsize)
+
+
+COMMIT_BATCH = 10000
 
 
 def open_tsv(file_path):
@@ -41,6 +46,9 @@ def parse_ebird_dump(file_path, start_row):
         now = datetime.now()
         now_format = "%d/%m/%y %H:%M:%S"
         print("Start time:", datetime.strftime(now, now_format))
+
+        # This looks crazy, but it's needed for performance reasons.
+        django.db.transaction.set_autocommit(autocommit=False)
         for e in reader:
             if count < start_row:
                 count +=1
@@ -183,10 +191,20 @@ def parse_ebird_dump(file_path, start_row):
                     now = datetime.now()
                     now_format = "%d/%m/%y %H:%M:%S"
                     print(datetime.strftime(now, now_format), count)
+                if count % COMMIT_BATCH == 0:
+                    django.db.transaction.commit()
+                    django.db.transaction.set_autocommit(autocommit=False)
+                    now = datetime.now()
+                    now_format = "%d/%m/%y %H:%M:%S"
+                    print(datetime.strftime(now, now_format), "Commit")
             except Exception as ex:
+                django.db.transaction.set_autocommit(autocommit=True)
                 print(count)
                 print(e)
                 raise ex
+        django.db.transaction.commit()
+        django.db.transaction.set_autocommit(autocommit=True)
+
         now = datetime.now()
         now_format = "%d/%m/%y %H:%M:%S"
         print("Final count:", count, "End time:", datetime.strftime(now, now_format))
