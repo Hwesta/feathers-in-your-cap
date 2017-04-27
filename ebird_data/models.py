@@ -84,6 +84,7 @@ class Location(models.Model):
 
 
 class Locality(models.Model):
+    locality_name = models.TextField()
     locality_id = models.IntegerField(primary_key=True)
     locality_type = models.CharField(max_length=2)
 
