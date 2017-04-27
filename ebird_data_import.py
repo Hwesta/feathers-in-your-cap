@@ -57,7 +57,7 @@ def parse_ebird_dump(file_path, start_row):
                         number_observed = None
                         is_x = True
                     else:
-                        number_observed = count
+                        number_observed = obs_count
                         is_x = False
                     age_sex = e['AGE/SEX']
                     species_comments = e['SPECIES COMMENTS']
@@ -98,7 +98,7 @@ def parse_ebird_dump(file_path, start_row):
                     lat = float(e['LATITUDE'])
                     lon = float(e['LONGITUDE'])
                     coords = Point(lon, lat)  # PostGIS and GeoDjango both expect this as a longitude/latitude pair.
-                    locality = e['LOCALITY']
+                    locality_name = e['LOCALITY']
                     # In data in the form of 'L#######' but we want just #s.
                     locality_id = int(e['LOCALITY ID'][1:])
                     locality_type = e[' LOCALITY TYPE']  # No, that leading space isn't an error, in original data.
@@ -129,7 +129,7 @@ def parse_ebird_dump(file_path, start_row):
                     # Continue with models that don't depend on others, but that have multiple attributes.
                     sp, _ = StateProvince.objects.get_or_create(state_province=state_province, defaults={'state_code': state_code})
                     cnty, _ = County.objects.get_or_create(county=county, defaults={'county_code': county_code})
-                    local, _ = Locality.objects.get_or_create(locality_id=locality_id, defaults={'locality_type': locality_type})
+                    local, _ = Locality.objects.get_or_create(locality_id=locality_id, defaults={'locality_type': locality_type, 'locality_name': locality_name})
                     cntry, _ = Country.objects.get_or_create(country=country, defaults={'country_code': country_code})
                     obs, _ = Observer.objects.get_or_create(observer_id=observer_id, defaults={'first_name': first_name, 'last_name': last_name})
                     # Then continue with the models that only depend on the ones we've got.
@@ -140,7 +140,8 @@ def parse_ebird_dump(file_path, start_row):
                     # Next the checklist model
                     check, _ = Checklist.objects.get_or_create(checklist=checklist_id, defaults={'location': loc, 'start_date_time': start, 'checklist_comments': checklist_comments, 'duration': duration, 'distance': distance, 'area': area, 'number_of_observers': number_of_observers, 'complete_checklist': complete_checklist, 'group_id': group_id, 'approved': approved, 'reviewed': reviewed, 'reason': reason, 'protocol': proto, 'project': proj})
                     # Finally the remaining models that depend on all the previous ones.
-                    obs = Observation.objects.get_or_create(observation=observation_id, defaults={'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex, 'species_comments': species_comments, 'species': sp, 'subspecies': subsp, 'breeding_atlas_code': atlas, 'date_last_edit': last_edit, 'has_media': has_media, 'bcr_code': bcr, 'usfws_code': usfws, 'checklist': check})
+                    # We don't care about the result here because get_or_create is being used to be idempotent.
+                    _, _ = Observation.objects.get_or_create(observation=observation_id, defaults={'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex, 'species_comments': species_comments, 'species': sp, 'subspecies': subsp, 'breeding_atlas_code': atlas, 'date_last_edit': last_edit, 'has_media': has_media, 'bcr_code': bcr, 'usfws_code': usfws, 'checklist': check})
                 
                     count += 1
                     if count % 1000 == 0:
@@ -213,7 +214,7 @@ def int_or_none(i):
 def parse_command_line():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', dest="input_file", help="Path to ebird datafile.", metavar="INFILE", required=True)
-    parser.add_argument('-r', '--row', dest="start_row", help="Start parsing at this row.", metavar="STARTROW", required=False)
+    parser.add_argument('-r', '--row', dest="start_row", help="Start parsing at this row.", metavar="STARTROW", required=False, default=0)
     args = parser.parse_args()
     return args
     
