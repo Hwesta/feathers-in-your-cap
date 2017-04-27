@@ -9,12 +9,13 @@ class Observation(models.Model):
     age_sex = models.TextField()  # This is a first pass, this field seems like it's freeform text of structured data.
     species_comments = models.TextField(null=True, blank=True)
     species = models.ForeignKey('Species')
-    subspecies = models.ForeignKey('SubSpecies')
-    breeding_atlas_code = models.ForeignKey('BreedingAtlas')
+    subspecies = models.ForeignKey('SubSpecies', null=True, blank=True)
+    breeding_atlas_code = models.ForeignKey('BreedingAtlas', null=True, blank=True)
     date_last_edit = models.DateTimeField(null=True, blank=True)
     has_media = models.BooleanField()
-    bcr_code = models.ForeignKey('BCR')
-    usfws_code = models.ForeignKey('USFWS')
+    bcr_code = models.ForeignKey('BCR', null=True, blank=True)
+    usfws_code = models.ForeignKey('USFWS', null=True, blank=True)
+    observer = models.ForeignKey('Observer', null=True, blank=True)
 
     def __str__(self):
         if self.is_x:
@@ -58,8 +59,8 @@ class Checklist(models.Model):
     approved = models.BooleanField()
     reviewed = models.BooleanField()
     reason = models.TextField()
-    protocol = models.ForeignKey('Protocol')
-    project = models.ForeignKey('Project')
+    protocol = models.ForeignKey('Protocol', null=True, blank=True)
+    project = models.ForeignKey('Project', null=True, blank=True)
 
     def __str__(self):
         return "{}, group id: {}: {}".format(self.checklist, self.group_id, self.start_date_time)
@@ -86,8 +87,8 @@ class Project(models.Model):
 class Species(models.Model):
     common_name = models.TextField()
     scientific_name = models.TextField(primary_key=True)
-    taxonomic_order = models.ForeignKey('TaxonomicOrder')
-    category = models.ForeignKey('SpeciesCategory')
+    taxonomic_order = models.ForeignKey('TaxonomicOrder', null=True, blank=True)
+    category = models.ForeignKey('SpeciesCategory', null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Species"
@@ -134,7 +135,7 @@ class Location(models.Model):
     country = models.ForeignKey('Country')
     state_province = models.ForeignKey('StateProvince')
     county = models.ForeignKey('County')
-    iba_code = models.ForeignKey('IBA')
+    iba_code = models.ForeignKey('IBA', null=True, blank=True)
 
     def __str__(self):
         return "{}".format(self.coords.coords)
