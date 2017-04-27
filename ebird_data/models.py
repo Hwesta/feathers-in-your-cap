@@ -15,6 +15,13 @@ class Observation(models.Model):
     has_media = models.BooleanField()
     bcr_code = models.ForeignKey('BCR')
     usfws_code = models.ForeignKey('USFWS')
+
+    def __str__(self):
+        if self.is_x:
+            num_obs = 'X'
+        else:
+            num_obs = self.number_observed
+        return "id: {} checklist: {}, {}: {}".format(self.observation, self.checklist.checklist, num_obs, self.species.common_name)
     
     
 class Observer(models.Model):
@@ -22,9 +29,19 @@ class Observer(models.Model):
     first_name = models.TextField()
     last_name = models.TextField()
 
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
     
 class BreedingAtlas(models.Model):
     breeding_atlas_code = models.CharField(max_length=8, primary_key=True)
+
+    class Meta:
+        verbose_name = "Breeding Bird Atlas Code"
+        verbose_name_plural = "Breeding Bird Atlas Codes"
+
+    def __str__(self):
+        return "{}".format(self.breeding_atlas_code)
 
 
 class Checklist(models.Model):
@@ -44,13 +61,26 @@ class Checklist(models.Model):
     protocol = models.ForeignKey('Protocol')
     project = models.ForeignKey('Project')
 
+    def __str__(self):
+        return "{}, group id: {}: {}".format(self.checklist, self.group_id, self.start_date_time)
+
 
 class Protocol(models.Model):
     protocol_type = models.TextField()
 
+    def __str__(self):
+        return "{}".format(self.protocol_type)
+
     
 class Project(models.Model):
     project_code = models.TextField()
+
+    class Meta:
+        verbose_name = "Project Code"
+        verbose_name_plural = "Project Codes"
+
+    def __str__(self):
+        return "{}".format(self.project_code)
 
     
 class Species(models.Model):
@@ -58,6 +88,12 @@ class Species(models.Model):
     scientific_name = models.TextField(primary_key=True)
     taxonomic_order = models.ForeignKey('TaxonomicOrder')
     category = models.ForeignKey('SpeciesCategory')
+
+    class Meta:
+        verbose_name_plural = "Species"
+
+    def __str__(self):
+        return "{}".format(self.common_name)
     
     
 class SubSpecies(models.Model):
@@ -65,13 +101,31 @@ class SubSpecies(models.Model):
     common_name = models.TextField()
     scientific_name = models.TextField()
 
-    
+    class Meta:
+        verbose_name_plural = "Sub Species"
+
+    def __str__(self):
+        return "{}".format(self.common_name)
+
+
 class TaxonomicOrder(models.Model):
     taxonomic_order = models.TextField(primary_key=True)
+
+    class Meta:
+        verbose_name_plural = "Taxonomical Orders"
+
+    def __str__(self):
+        return "{}".format(self.taxonomic_order)
     
 
 class SpeciesCategory(models.Model):
     category = models.TextField(primary_key=True)
+
+    class Meta:
+        verbose_name_plural = "Species Categories"
+
+    def __str__(self):
+        return "{}".format(self.category)
     
     
 class Location(models.Model):
@@ -82,34 +136,84 @@ class Location(models.Model):
     county = models.ForeignKey('County')
     iba_code = models.ForeignKey('IBA')
 
+    def __str__(self):
+        return "{}".format(self.coords.coords)
+
 
 class Locality(models.Model):
     locality_name = models.TextField()
     locality_id = models.IntegerField(primary_key=True)
     locality_type = models.CharField(max_length=2)
 
+    class Meta:
+        verbose_name_plural = "Localities"
+
+    def __str__(self):
+        return "{}: {}, {}".format(self.locality_id, self.locality_name, self.locality_type)
+
 
 class Country(models.Model):
     country_code = models.TextField(primary_key=True)
     country = models.TextField(unique=True)
+
+    class Meta:
+        verbose_name_plural = "Countries"
+
+    def __str__(self):
+        return "{} ({})".format(self.country, self.country_code)
     
 
 class StateProvince(models.Model):
     state_province = models.TextField(primary_key=True)
     state_code = models.TextField(unique=True)
+
+    class Meta:
+        verbose_name = "State/Province"
+        verbose_name_plural = "States/Provinces"
+
+    def __str__(self):
+        return "{} ({})".format(self.state_province, self.state_code)
     
 
 class County(models.Model):
     county = models.TextField(primary_key=True)
     county_code = models.TextField(unique=True)
+
+    class Meta:
+        verbose_name_plural = "Counties"
+
+    def __str__(self):
+        return "{} ({})".format(self.county, self.county_code)
     
 
 class IBA(models.Model):    
     iba_code = models.TextField(primary_key=True)
+
+    class Meta:
+        verbose_name = "IBA Code"
+        verbose_name_plural = "IBA Codes"
+
+    def __str__(self):
+        return "{}".format(self.iba_code)
     
     
 class BCR(models.Model):
     bcr_code = models.TextField(primary_key=True)
-    
+
+    class Meta:
+        verbose_name = "BCR Code"
+        verbose_name_plural = "BCR Codes"
+
+    def __str__(self):
+        return "{}".format(self.bcr_code)
+
+
 class USFWS(models.Model):
     usfws_code = models.TextField(primary_key=True)
+
+    class Meta:
+        verbose_name = "USFWS Code"
+        verbose_name_plural = "USFWS Codes"
+
+    def __str__(self):
+        return "{}".format(self.usfws_code)
