@@ -10,6 +10,8 @@ from django.contrib.gis.geos import Point
 from dateutil.parser import parse
 
 from . import models
+from achievements.models import Achievement, AchievementProgress
+from achievements import views as achievement_views
 
 class UploadFileForm(forms.Form):
     ebirdzip = forms.FileField(label='eBird personal data CSV')
@@ -89,3 +91,16 @@ def parse_filestream(filestream, user):
                 'breeding_atlas_code': entry['Breeding Code'] or '',
             }
         )
+
+@login_required
+def achievements(request):
+    user = request.user
+    for achievement in Achievement.objects.exclude(achievementprogress__user=user):
+        print(achievement)
+        func = getattr(achievement_views, achievement.code)
+        rc = func(user)
+        print(rc)
+        if rc > 0:
+            AchievementProgress.objects.get_or_create(user=user, achievement=achievement)
+
+    return HttpResponseRedirect('/admin/achievements/achievementprogress/')

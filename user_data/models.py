@@ -25,6 +25,8 @@ class Location(gismodels.Model):
 
 # Personal data
 
+# Seen species? Easy way to find species that a user has seen? Based on a county?
+
 class Checklist(models.Model):
     id = models.IntegerField(primary_key=True)  # Strip the leading S off the checklist ID
     user = models.ForeignKey(settings.AUTH_USER_MODEL)

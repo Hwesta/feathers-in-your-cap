@@ -20,5 +20,6 @@ from user_data import views
 
 urlpatterns = [
     url(r'^admin/upload_user/', views.upload),
+    url(r'^admin/calculate_achievements/', views.achievements),
     url(r'^admin/', admin.site.urls),
 ]
