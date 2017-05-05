@@ -13,8 +13,6 @@ class Observation(models.Model):
     breeding_atlas_code = models.ForeignKey('BreedingAtlas', null=True, blank=True)
     date_last_edit = models.DateTimeField(null=True, blank=True)
     has_media = models.BooleanField()
-    bcr_code = models.ForeignKey('BCR', null=True, blank=True)
-    usfws_code = models.ForeignKey('USFWS', null=True, blank=True)
     observer = models.ForeignKey('Observer', null=True, blank=True)
 
     def __str__(self):
@@ -60,29 +58,16 @@ class Checklist(models.Model):
     reviewed = models.BooleanField()
     reason = models.TextField()
     protocol = models.ForeignKey('Protocol', null=True, blank=True)
-    project = models.ForeignKey('Project', null=True, blank=True)
-    atlas_block = models.ForeignKey('AtlasBlock', null=True, blank=True)
 
     def __str__(self):
         return "{}, group id: {}: {}".format(self.checklist, self.group_id, self.start_date_time)
 
 
 class Protocol(models.Model):
-    protocol_type = models.TextField()
+    protocol_type = models.TextField(primary_key=True)
 
     def __str__(self):
         return "{}".format(self.protocol_type)
-
-    
-class Project(models.Model):
-    project_code = models.TextField()
-
-    class Meta:
-        verbose_name = "Project Code"
-        verbose_name_plural = "Project Codes"
-
-    def __str__(self):
-        return "{}".format(self.project_code)
 
     
 class Species(models.Model):
@@ -101,7 +86,7 @@ class Species(models.Model):
 class SubSpecies(models.Model):
     parent_species = models.ForeignKey('Species')
     common_name = models.TextField()
-    scientific_name = models.TextField()
+    scientific_name = models.TextField(primary_key=True)
 
     class Meta:
         verbose_name_plural = "Sub Species"
@@ -111,7 +96,7 @@ class SubSpecies(models.Model):
 
 
 class TaxonomicOrder(models.Model):
-    taxonomic_order = models.TextField(primary_key=True)
+    taxonomic_order = models.DecimalField(primary_key=True, decimal_places=10, max_digits=20)
 
     class Meta:
         verbose_name_plural = "Taxonomical Orders"
@@ -136,7 +121,6 @@ class Location(models.Model):
     country = models.ForeignKey('Country')
     state_province = models.ForeignKey('StateProvince')
     county = models.ForeignKey('County')
-    iba_code = models.ForeignKey('IBA', null=True, blank=True)
 
     def __str__(self):
         return "{}".format(self.coords.coords)
@@ -186,43 +170,3 @@ class County(models.Model):
 
     def __str__(self):
         return "{} ({})".format(self.county, self.county_code)
-    
-
-class IBA(models.Model):    
-    iba_code = models.TextField(primary_key=True)
-
-    class Meta:
-        verbose_name = "IBA Code"
-        verbose_name_plural = "IBA Codes"
-
-    def __str__(self):
-        return "{}".format(self.iba_code)
-    
-    
-class BCR(models.Model):
-    bcr_code = models.TextField(primary_key=True)
-
-    class Meta:
-        verbose_name = "BCR Code"
-        verbose_name_plural = "BCR Codes"
-
-    def __str__(self):
-        return "{}".format(self.bcr_code)
-
-
-class USFWS(models.Model):
-    usfws_code = models.TextField(primary_key=True)
-
-    class Meta:
-        verbose_name = "USFWS Code"
-        verbose_name_plural = "USFWS Codes"
-
-    def __str__(self):
-        return "{}".format(self.usfws_code)
-
-
-class AtlasBlock(models.Model):
-    atlas_block = models.TextField(primary_key=True)
-
-    def __str__(self):
-        return "{}".format(self.atlas_block)
