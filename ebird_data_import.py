@@ -70,7 +70,7 @@ def parse_ebird_dump(file_path, start_row):
                 species_comments = e['SPECIES COMMENTS']
                 breeding_atlas_code = e['BREEDING BIRD ATLAS CODE']
                 # Species
-                taxonomic_order = e['TAXONOMIC ORDER']
+                taxonomic_order = decimal_or_none(e['TAXONOMIC ORDER'])
                 species_category = e['CATEGORY']
                 common_name = e['COMMON NAME']
                 scientific_name = e['SCIENTIFIC NAME']
@@ -95,7 +95,7 @@ def parse_ebird_dump(file_path, start_row):
                 reason = e['REASON']
                 protocol = e['PROTOCOL TYPE']
                 # Project
-                project = e['PROJECT CODE']
+                # project = e['PROJECT CODE']
                 # Observer
                 # The is is in the form of 'obsr######' but we want just the #s.
                 observer_id = int(e['OBSERVER ID'][4:])
@@ -112,25 +112,25 @@ def parse_ebird_dump(file_path, start_row):
                 state_code = e['STATE CODE']
                 county_code = e['COUNTY CODE']
                 county = e['COUNTY']
-                iba_code = e['IBA CODE']
+                # iba_code = e['IBA CODE']
                 state_province = e['STATE']
                 country = e['COUNTRY']
                 country_code = e['COUNTRY CODE']
-                bcr_code = e['BCR CODE']
-                usfws_code = e['USFWS CODE']
+                # bcr_code = e['BCR CODE']
+                # usfws_code = e['USFWS CODE']
                 has_media = bool(int(e['HAS MEDIA']))
                 edit = e['LAST EDITED DATE']
-                atlas_block = e['ATLAS BLOCK']
+                # atlas_block = e['ATLAS BLOCK']
                 if edit != '':
                     last_edit = datetime.strptime(edit, "%Y-%m-%d %H:%M:%S")
                 else:
                     last_edit = None
                 # Start with the models that don't depend on other models and have single attributes.
                 # All of these fields can potentially be blank.
-                if iba_code == '':
-                    iba = None
-                else:
-                    iba, _ = IBA.objects.get_or_create(iba_code=iba_code)
+                # if iba_code == '':
+                #     iba = None
+                # else:
+                #     iba, _ = IBA.objects.get_or_create(iba_code=iba_code)
                 if taxonomic_order == '':
                     tax = None
                 else:
@@ -143,26 +143,26 @@ def parse_ebird_dump(file_path, start_row):
                     proto = None
                 else:
                     proto, _ = Protocol.objects.get_or_create(protocol_type=protocol)
-                if project == '':
-                    proj = None
-                else:
-                    proj, _ = Project.objects.get_or_create(project_code=project)
+                # if project == '':
+                #     proj = None
+                # else:
+                #     proj, _ = Project.objects.get_or_create(project_code=project)
                 if breeding_atlas_code == '':
                     atlas = None
                 else:
                     atlas, _ = BreedingAtlas.objects.get_or_create(breeding_atlas_code=breeding_atlas_code)
-                if bcr_code == '':
-                    bcr = None
-                else:
-                    bcr, _ = BCR.objects.get_or_create(bcr_code=bcr_code)
-                if usfws_code == '':
-                    usfws = None
-                else:
-                    usfws, _ = USFWS.objects.get_or_create(usfws_code=usfws_code)
-                if atlas_block == '':
-                    atlas, _ = AtlasBlock.objects.get_or_create(atlas_block=atlas_block)
-                else:
-                    atlas = None
+                # if bcr_code == '':
+                #     bcr = None
+                # else:
+                #     bcr, _ = BCR.objects.get_or_create(bcr_code=bcr_code)
+                # if usfws_code == '':
+                #     usfws = None
+                # else:
+                #     usfws, _ = USFWS.objects.get_or_create(usfws_code=usfws_code)
+                # if atlas_block == '':
+                #     atlasb, _ = AtlasBlock.objects.get_or_create(atlas_block=atlas_block)
+                # else:
+                #     atlasb = None
                 # Continue with models that don't depend on others, but that have multiple attributes.
                 sp, _ = StateProvince.objects.get_or_create(state_province=state_province, defaults={'state_code': state_code})
                 cnty, _ = County.objects.get_or_create(county=county, defaults={'county_code': county_code})
@@ -173,7 +173,8 @@ def parse_ebird_dump(file_path, start_row):
                 else:
                     obs, _ = Observer.objects.get_or_create(observer_id=observer_id, defaults={'first_name': first_name, 'last_name': last_name})
                 # Then continue with the models that only depend on the ones we've got.
-                loc, _ = Location.objects.get_or_create(coords=coords, defaults={'locality': local, 'country': cntry, 'state_province': sp, 'county': cnty, 'iba_code': iba})
+                # loc, _ = Location.objects.get_or_create(coords=coords, defaults={'locality': local, 'country': cntry, 'state_province': sp, 'county': cnty, 'iba_code': iba})
+                loc, _ = Location.objects.get_or_create(coords=coords, defaults={'locality': local, 'country': cntry, 'state_province': sp, 'county': cnty})
                 sp, _ = Species.objects.get_or_create(scientific_name=scientific_name, defaults={'common_name': common_name, 'taxonomic_order': tax, 'category': spcat})
                 # SubSpecies depends on Species.
                 if subspecies_scientific_name == '':
@@ -181,10 +182,12 @@ def parse_ebird_dump(file_path, start_row):
                 else:
                     subsp, _ = SubSpecies.objects.get_or_create(scientific_name=subspecies_scientific_name, defaults={'parent_species': sp, 'common_name': subspecies_common_name})
                 # Next the checklist model
-                check, _ = Checklist.objects.get_or_create(checklist=checklist_id, defaults={'location': loc, 'start_date_time': start, 'checklist_comments': checklist_comments, 'duration': duration, 'distance': distance, 'area': area, 'number_of_observers': number_of_observers, 'complete_checklist': complete_checklist, 'group_id': group_id, 'approved': approved, 'reviewed': reviewed, 'reason': reason, 'protocol': proto, 'project': proj, 'atlas_block': atlas})
+                # check, _ = Checklist.objects.get_or_create(checklist=checklist_id, defaults={'location': loc, 'start_date_time': start, 'checklist_comments': checklist_comments, 'duration': duration, 'distance': distance, 'area': area, 'number_of_observers': number_of_observers, 'complete_checklist': complete_checklist, 'group_id': group_id, 'approved': approved, 'reviewed': reviewed, 'reason': reason, 'protocol': proto, 'project': proj, 'atlas_block': atlasb})
+                check, _ = Checklist.objects.get_or_create(checklist=checklist_id, defaults={'location': loc, 'start_date_time': start, 'checklist_comments': checklist_comments, 'duration': duration, 'distance': distance, 'area': area, 'number_of_observers': number_of_observers, 'complete_checklist': complete_checklist, 'group_id': group_id, 'approved': approved, 'reviewed': reviewed, 'reason': reason, 'protocol': proto})
                 # Finally the remaining models that depend on all the previous ones.
                 # We don't care about the result here because get_or_create is being used to be idempotent.
-                _, _ = Observation.objects.get_or_create(observation=observation_id, defaults={'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex, 'species_comments': species_comments, 'species': sp, 'subspecies': subsp, 'breeding_atlas_code': atlas, 'date_last_edit': last_edit, 'has_media': has_media, 'bcr_code': bcr, 'usfws_code': usfws, 'checklist': check, 'observer': obs})
+                # _, _ = Observation.objects.get_or_create(observation=observation_id, defaults={'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex, 'species_comments': species_comments, 'species': sp, 'subspecies': subsp, 'breeding_atlas_code': atlas, 'date_last_edit': last_edit, 'has_media': has_media, 'bcr_code': bcr, 'usfws_code': usfws, 'checklist': check, 'observer': obs})
+                _, _ = Observation.objects.get_or_create(observation=observation_id, defaults={'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex, 'species_comments': species_comments, 'species': sp, 'subspecies': subsp, 'breeding_atlas_code': atlas, 'date_last_edit': last_edit, 'has_media': has_media, 'checklist': check, 'observer': obs})
 
                 count += 1
                 if count % 1000 == 0:
