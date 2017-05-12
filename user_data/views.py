@@ -1,4 +1,6 @@
 import csv
+import io
+import zipfile
 
 from django import forms
 from django.http import HttpResponseRedirect
@@ -14,7 +16,7 @@ from achievements.models import Achievement, AchievementProgress
 from achievements import views as achievement_views
 
 class UploadFileForm(forms.Form):
-    ebirdzip = forms.FileField(label='eBird personal data CSV')
+    ebirdzip = forms.FileField(label='eBird personal data CSV or ZIP')
 
 
 @login_required
@@ -22,9 +24,18 @@ def upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            filestream = request.FILES['ebirdzip']
-            # TODO handle zip file
-            parse_filestream(filestream, request.user)
+            uploaded_file = request.FILES['ebirdzip']
+
+            if uploaded_file.name.endswith('.zip'):
+                zfile = zipfile.ZipFile(uploaded_file)
+                filestream = zfile.open('MyEBirdData.csv')
+            elif uploaded_file.name.endswith('.csv'):
+                filestream = uploaded_file
+            else:
+                raise TypeError('Must be zip or csv file')
+
+            stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
+            parse_filestream(stringify, request.user)
             return HttpResponseRedirect('/admin/')
     else:
         form = UploadFileForm()
