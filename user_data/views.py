@@ -47,13 +47,7 @@ def parse_filestream(filestream, user):
     csvreader = csv.DictReader(filestream)
     for entry in csvreader:
         # Species
-        species, _ = models.Species.objects.get_or_create(
-            scientific_name=entry['Scientific Name'],
-            defaults={
-                'common_name': entry['Common Name'],
-                'taxonomic_order': entry['Taxonomic Order']
-            }
-        )
+        species = models.Species.objects.get(scientific_name=entry['Scientific Name'])
 
         # Location
         lat = float(entry['Latitude'])

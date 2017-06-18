@@ -6,9 +6,16 @@ from django.contrib.gis.db import models as gismodels
 # Static info - this may be moved to ebird data dump app
 
 class Species(models.Model):
-    common_name = models.TextField()  # Use English IOC info
+    taxonomic_order = models.DecimalField(primary_key=True, decimal_places=10, max_digits=20)
+    category = models.TextField()
     scientific_name = models.TextField(unique=True)
-    taxonomic_order = models.TextField()
+    common_name = models.TextField()  # Use eBird names
+    ioc_name = models.TextField()
+    order = models.TextField(blank=True)
+    family = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Species'
 
     def __str__(self):
         return '{s.scientific_name} ({s.common_name})'.format(s=self)
