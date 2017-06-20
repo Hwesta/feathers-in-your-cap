@@ -85,4 +85,26 @@ Tasks:
 * Look at leaderboard of users they follow
 * Customize the achivement the leaderboard of users they follow is displaying
 * Update privacy settings
-* 
+
+Importance & Frequency
+
+| Task                        | Importance | Frequency |
+|-----------------------------|------------|-----------|
+| Create account              | High       | Low       |
+| Log in                      | High       | Medium    |
+| Log out                     | High       | Low       |
+| Config eBird access         | High       | Low       |
+| Update eBird data           | High       | High      |
+| All done achievements       | High       | Medium    |
+| Done achievement detail     | Low        | Low       |
+| All achievements            | Medium     | Medium    |
+| Not done achievements       | High       | High      |
+| Not done achievement detail | High       | High      |
+| Find user                   | Medium     | Medium    |
+| Other user achievements     | Medium     | Low       |
+| Compare achievements        | High       | Medium    |
+| Follow/unfollow user        | Medium     | Low       |
+| List users followed         | Medium     | Low       |
+| Followed users leaderboard  | High       | High      |
+| Customize leaderboard       | High       | Medium    |
+| Update privacy settings     | High       | Low       |
