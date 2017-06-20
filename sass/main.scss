@@ -1,0 +1,42 @@
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/9/2014
+* Sass Version by Seth Coelen https://github.com/whatsnewsaes
+* Local modifications Copyright 2017 Holly Becker
+*/
+
+/* Base files. */
+@import "variables";
+@import "normalize";
+@import "base";
+@import "modules";
+
+body {
+    box-sizing: border-box;
+}
+
+header {
+    box-sizing: border-box;
+}
+
+section {
+    box-sizing: border-box;
+}
+
+nav {
+    box-sizing: border-box;
+    ul {
+    }
+}
+
+main {
+    box-sizing: border-box;
+}
+
+footer {
+    box-sizing: border-box;
+}
