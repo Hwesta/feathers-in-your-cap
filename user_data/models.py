@@ -7,7 +7,7 @@ from django.contrib.gis.db import models as gismodels
 
 class Species(models.Model):
     taxonomic_order = models.DecimalField(primary_key=True, decimal_places=10, max_digits=20)
-    category = models.TextField()
+    category = models.TextField(help_text='species, issf, etc')
     scientific_name = models.TextField(unique=True)
     common_name = models.TextField()  # Use eBird names
     ioc_name = models.TextField()

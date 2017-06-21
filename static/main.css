@@ -560,4 +560,21 @@ footer {
     margin: 0;
     padding: 0; }
 
+.achievements-display {
+  margin: auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start; }
+
+.achievement {
+  display: flex;
+  flex-flow: row nowrap; }
+  .achievement h3 {
+    padding: 0;
+    margin: 0 1rem;
+    font-size: 2rem; }
+  .achievement p {
+    padding: 0;
+    margin: 0 1rem; }
+
 /*# sourceMappingURL=main.css.map */
