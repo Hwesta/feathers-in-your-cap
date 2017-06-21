@@ -13,7 +13,7 @@ from dateutil.parser import parse
 
 from . import models
 from achievements.models import Achievement, AchievementProgress
-from achievements import views as achievement_views
+from achievements import calculate
 
 class UploadFileForm(forms.Form):
     ebirdzip = forms.FileField(label='eBird personal data CSV or ZIP')
@@ -102,10 +102,10 @@ def achievements(request):
     user = request.user
     for achievement in Achievement.objects.exclude(achievementprogress__user=user):
         print(achievement)
-        func = getattr(achievement_views, achievement.code)
+        func = getattr(calculate, achievement.code)
         level, progress = func(user)
         print(level, progress)
-        if level > 0 or progress != None:
+        if level > 0 or progress is not None:
             AchievementProgress.objects.update_or_create(
                 user=user,
                 achievement=achievement,
