@@ -465,51 +465,46 @@ td:last-child {
 
 body {
   box-sizing: border-box;
-  background: #e1e1e1; }
+  background: #75C7F0;
+  padding-top: 8rem; }
 
 header {
   box-sizing: border-box;
-  border: 1px solid #333;
-  width: 80%;
-  margin: 1rem auto;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #333;
+  min-height: 6rem;
   padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  border-radius: 5px;
   background: #fff;
   color: #333; }
+  header img {
+    height: 2em;
+    float: left; }
   header h1 {
-    margin: 0; }
-  header ul {
-    list-style: none;
+    float: left;
     margin: 0;
-    padding: 1rem;
-    vertical-align: bottom; }
-    header ul li {
-      position: relative;
-      display: inline;
-      padding: 0 1rem; }
-
-nav {
-  box-sizing: border-box;
-  border: 1px solid #333;
-  width: 80%;
-  margin: 1rem auto;
-  border-radius: 5px;
-  background: #fff;
-  color: #333; }
-  nav ul {
+    margin-left: 1rem;
+    font-size: 2em; }
+  header ul {
     list-style: none;
     display: flex;
     flex-direction: row;
     margin: 0;
     padding: 0; }
-    nav ul li {
+    header ul#nav {
+      float: left; }
+    header ul#login {
+      float: right; }
+    header ul li {
       padding: 1rem;
       margin: 0 1rem; }
-      nav ul li a {
-        text-decoration: none; }
+      header ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold; }
 
 section {
   box-sizing: border-box;

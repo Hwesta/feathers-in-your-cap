@@ -11,8 +11,17 @@
     <link rel="stylesheet" href="{% static 'main.css' %}" />
   </head>
   <body>
-    <header id="header">
+    <header>
+      <img src="{% static 'logo.png' %}">
       <h1>Feathers in Your Cap</h1>
+
+      <nav>
+        <ul id='nav'>
+          <li><a href="#">Achievements</a></li>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Leaderboard</a></li>
+        </ul>
+      </nav>
 
       <ul id='login'>
         <li><a href='#'>Username</a></li>
@@ -21,23 +30,12 @@
 
     </header>
 
-    <nav>
-      <ul id='nav'>
-        <li><a href="#">Achievements</a></li>
-        <li><a href="#">Users</a></li>
-        <li><a href="#">Leaderboard</a></li>
-      </ul>
-
-    </nav>
-
     <main>
-      <h1>Heading</h1>
-
       <p>Feathers in your Cap is a birding achievements site powered by eBird.</p>
     </main>
 
 
-    <footer id="footer">
+    <footer>
       <p>Created by <a href='http://hollybecker.net'>Holly Becker</a> and <a href='http://dalefloer.com'>Dale Floer</a>.  Licensed under the <a href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL</a>. Code available on <a href='https://github.com/Hwesta/feathers-in-your-cap/'>GitHub</a></p>
     </footer>
 
