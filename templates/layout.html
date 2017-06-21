@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Feathers in Your Cap</title>
+    <title>{% block title %}Feathers in Your Cap{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'main.css' %}" />
   </head>
@@ -24,14 +24,21 @@
       </nav>
 
       <ul id='login'>
-        <li><a href='#'>Username</a></li>
-        <li><a>Logout</a></li>
+        {% if user.is_authenticated %}
+        <li><a href='#'>Hello, {{ user.get_username }}</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+        <li><a href='#'>Create Account</a></li>
+        <li><a href="{% url 'login' %}">Log in</a></li>
+        {% endif %}
       </ul>
 
     </header>
 
     <main>
+      {% block content %}
       <p>Feathers in your Cap is a birding achievements site powered by eBird.</p>
+      {% endblock %}
     </main>
 
 
