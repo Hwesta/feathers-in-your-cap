@@ -463,6 +463,32 @@ th:last-child,
 td:last-child {
   padding-right: 0; }
 
+.primary, .success, .info, .warning, .danger {
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px; }
+
+.primary {
+  color: #fff;
+  background-color: #75c7f0;
+  border-color: #0a415c; }
+
+.success {
+  background-color: #dff0d8;
+  border-color: #529138; }
+
+.info {
+  background-color: #d6edf7;
+  border-color: #2282ac; }
+
+.warning {
+  background-color: #fcf8e3;
+  border-color: #caad16; }
+
+.danger {
+  background-color: #f2dede;
+  border-color: #963b3b; }
+
 body {
   box-sizing: border-box;
   background: #75C7F0;

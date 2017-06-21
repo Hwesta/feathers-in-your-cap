@@ -309,3 +309,49 @@ th:last-child,
 td:last-child {
   padding-right: 0;
 }
+
+// Status classes
+//––––––––––––––––––––––––––––––––––––––––––––––––––
+
+%info-box {
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+
+}
+$primary-color: #75c7f0;
+$success-color: #dff0d8;
+$info-color: #d6edf7;
+$warning-color: #fcf8e3;
+$danger-color: #f2dede;
+
+.primary {
+  @extend %info-box;
+  color: #fff;
+  background-color: $primary-color;
+  border-color: darken($primary-color, 50%);
+}
+
+.success {
+  @extend %info-box;
+  background-color: $success-color;
+  border-color: darken($success-color, 50%);
+}
+
+.info {
+  @extend %info-box;
+  background-color: $info-color;
+  border-color: darken($info-color, 50%);
+}
+
+.warning {
+  @extend %info-box;
+  background-color: $warning-color;
+  border-color: darken($warning-color, 50%);
+}
+
+.danger {
+  @extend %info-box;
+  background-color: $danger-color;
+  border-color: darken($danger-color, 50%);
+}
