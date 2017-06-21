@@ -83,7 +83,7 @@ main {
     margin: 1rem auto;
     padding: 1rem 2rem;
 
-    border-radius: 5px;
+    border-radius: $global-radius;
     background: #fff;
     color: $dark-grey;
 }
@@ -95,7 +95,7 @@ footer {
     margin: 1rem auto;
     padding: 1rem;
 
-    border-radius: 5px;
+    border-radius: $global-radius;
     background: #fff;
     color: $dark-grey;
 

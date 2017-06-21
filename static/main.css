@@ -466,7 +466,7 @@ td:last-child {
 .primary, .success, .info, .warning, .danger {
   padding: 5px;
   border: 1px solid;
-  border-radius: 5px; }
+  border-radius: 4px; }
 
 .primary {
   color: #fff;
@@ -542,7 +542,7 @@ main {
   width: 80%;
   margin: 1rem auto;
   padding: 1rem 2rem;
-  border-radius: 5px;
+  border-radius: 4px;
   background: #fff;
   color: #333; }
 
@@ -552,7 +552,7 @@ footer {
   width: 80%;
   margin: 1rem auto;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 4px;
   background: #fff;
   color: #333;
   font-size: 1rem; }
