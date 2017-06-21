@@ -1,6 +1,16 @@
 from django.shortcuts import render
+from django.views.generic import ListView
 
 from user_data import models as user_models
+from achievements import models
+
+class AchievementProgressList(ListView):
+    context_object_name = 'achievement_progress'
+
+    def get_queryset(self):
+        return models.AchievementProgress.objects.filter(user=self.request.user)
+
+# Achievement Implementations
 
 def canadensis(user):
     canadensis = user_models.Species.objects.filter(scientific_name__contains='canadensis')

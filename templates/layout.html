@@ -15,13 +15,15 @@
       <img src="{% static 'logo.png' %}">
       <h1>Feathers in Your Cap</h1>
 
+      {% if user.is_authenticated %}
       <nav>
         <ul id='nav'>
-          <li><a href="#">Achievements</a></li>
+          <li><a href="{% url 'progress_list' %}">Achievements</a></li>
           <li><a href="#">Users</a></li>
           <li><a href="#">Leaderboard</a></li>
         </ul>
       </nav>
+      {% endif %}
 
       <ul id='login'>
         {% if user.is_authenticated %}
