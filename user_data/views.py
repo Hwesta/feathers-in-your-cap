@@ -103,9 +103,16 @@ def achievements(request):
     for achievement in Achievement.objects.exclude(achievementprogress__user=user):
         print(achievement)
         func = getattr(achievement_views, achievement.code)
-        rc = func(user)
-        print(rc)
-        if rc > 0:
-            AchievementProgress.objects.get_or_create(user=user, achievement=achievement)
+        level, progress = func(user)
+        print(level, progress)
+        if level > 0 or progress != None:
+            AchievementProgress.objects.update_or_create(
+                user=user,
+                achievement=achievement,
+                defaults={
+                    'level': level,
+                    'progress': progress,
+                }
+            )
 
     return HttpResponseRedirect('/admin/achievements/achievementprogress/')

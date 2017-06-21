@@ -18,8 +18,8 @@ class Achievement(models.Model):
 class AchievementProgress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     achievement = models.ForeignKey('Achievement')
-    # Progress?
-    # Level?  0 - not have, 1+ = has, 2+ = later levels?
+    level = models.IntegerField(help_text='Level of the badge', default=1)
+    progress = models.IntegerField(help_text='Progress towards next level', blank=True, null=True, default=None)
 
     def __str__(self):
         return '{s.user} has {s.achievement}'.format(s=self)
