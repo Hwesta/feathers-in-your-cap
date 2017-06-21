@@ -17,26 +17,102 @@
 
 body {
     box-sizing: border-box;
+    background: $light-grey;
 }
 
 header {
     box-sizing: border-box;
-}
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem;
 
-section {
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    border-radius: 5px;
+    background: #fff;
+    color: $dark-grey;
+
+    h1 {
+        margin: 0;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 1rem;
+
+        vertical-align: bottom;
+
+        li {
+            position: relative;
+            display: inline;
+            padding: 0 1rem;
+        }
+    }
+
 }
 
 nav {
     box-sizing: border-box;
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+
+    border-radius: 5px;
+    background: #fff;
+    color: $dark-grey;
     ul {
+        list-style: none;
+        display: flex;
+        flex-direction: row;
+
+        margin: 0;
+        padding: 0;
+        li {
+            padding: 1rem;
+            margin: 0 1rem;
+            a {
+                text-decoration: none;
+            }
+        }
     }
+}
+
+section {
+    box-sizing: border-box;
+    border: 1px solid #ff0;
 }
 
 main {
     box-sizing: border-box;
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem;
+
+    border-radius: 5px;
+    background: #fff;
+    color: $dark-grey;
 }
 
 footer {
     box-sizing: border-box;
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem;
+
+    border-radius: 5px;
+    background: #fff;
+    color: $dark-grey;
+
+    font-size: 1rem;
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
 }

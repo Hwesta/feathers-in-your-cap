@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from user_data import views
 
@@ -22,4 +23,5 @@ urlpatterns = [
     url(r'^admin/upload_user/', views.upload),
     url(r'^admin/calculate_achievements/', views.achievements),
     url(r'^admin/', admin.site.urls),
+    url(r'^$', TemplateView.as_view(template_name="index.html"), name='index'),
 ]
