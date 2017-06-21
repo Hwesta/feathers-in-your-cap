@@ -22,7 +22,7 @@
     </div>
   </div>
 {% empty %}
-  <p>You don't have any achievements yet! Have you <a href='#'>configured access to you eBird data</a>?</p>
+  <p>You don't have any achievements yet! Have you <a href="{% url 'configure_ebird' %}">configured access to you eBird data</a>?</p>
 {% endfor %}
 </div>
 

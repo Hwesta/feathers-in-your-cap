@@ -4,12 +4,13 @@ import zipfile
 
 from django import forms
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point
 
 from dateutil.parser import parse
+import requests
 
 from . import models
 from achievements.models import Achievement, AchievementProgress
@@ -18,6 +19,27 @@ from achievements import calculate
 class UploadFileForm(forms.Form):
     ebirdzip = forms.FileField(label='eBird personal data CSV or ZIP')
 
+class UploadURLForm(forms.Form):
+    ebirdurl = forms.URLField(label='URL to eBird export sent in email from eBird')
+
+
+@login_required
+def configure_ebird(request):
+    if request.method == 'POST':
+        form = UploadURLForm(request.POST)
+        if form.is_valid():
+            response = requests.get(form.cleaned_data['ebirdurl'])
+            stream = io.BytesIO(response.content)
+
+            zfile = zipfile.ZipFile(stream)
+            filestream = zfile.open('MyEBirdData.csv')
+
+            stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
+            parse_filestream(stringify, request.user)
+            return HttpResponseRedirect(reverse('progress_list'))
+    else:
+        form = UploadURLForm()
+    return render(request, 'user_data/configure_ebird.html', {'form': form})
 
 @login_required
 def upload(request):
