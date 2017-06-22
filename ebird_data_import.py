@@ -19,14 +19,184 @@ from ebird_data.models import *
 COMMIT_BATCH = 10000
 
 
-def parse_ebird_dump(file_path, start_row):
+def parse_ebird_taxonomy(file_path):
+    """
+    Used to parse the eBird_Taxonomy_*.csv to create species and subspecies database entries.
+    Performs two fixes for errors in the taxonomy CSV file, and prints information on the fixes along the way:
+        1. There are three duplicated scientific names. These are incorrect and need to be replaced with the correct ones.
+        2. There are ~112 taxonomic order ids that are incorrect due to rounding when the file was exported. These are replaced
+            with the correct taxonomic order ids (determined from the Excel spreadsheet, which doesn't have these ieeues).
+    Args:
+        file_path (str): path of the csv file to open and parse.
+    Returns:
+        Two dictionaries:
+            Species, with the key being a Decimal representation of the taxonomy order id, 
+            and the values being dictionaries with the common_name and scientific_name.
+            Subspecies, A dictionary with the key being a Decimal representation of the taxonomy order id, 
+            and the values being dictionaries with the common_name and scientific_name, its category and its parent's scientific name.
+            - spuh, slash, hybrid and intergrade will never have parents, so they will be set to None.
+            - issf will always have a parent.
+            - form and domestic can both have and not have parents.
+
+    """
+    csv_duplicate_fixes = {'734': "Crax blumenbachii",
+                           '1330': "Crossoptilon crossoptilon [crossoptilon Group]",
+                           '1583.6': "Tachybaptus ruficollis tricolor/vulcanorum"}
+    csv_truncated_tax_fixes = {
+        'Tanygnathus gramineus': '11587.775105', 'Tanygnathus megalorynchos': '11587.77511',
+        'Pezoporus wallicus flaviventris': '11587.775205', 'Pezoporus wallicus wallicus': '11587.77521',
+        'Pezoporus occidentalis': '11587.775215', 'Neopsittacus musschenbroekii': '11587.77522',
+        'Neophema bourkii': '11587.775255', 'Neophema chrysostoma': '11587.77526', 'Neophema elegans': '11587.775265',
+        'Neophema petrophila': '11587.77527', 'Neophema chrysogaster': '11587.775275',
+        'Neophema pulchella': '11587.77528',
+        'Neophema splendida': '11587.775285', 'Neophema sp.': '11587.775286', 'Lathamus discolor': '11587.77529',
+        'Prosopeia splendens': '11587.775295', 'Prosopeia tabuensis': '11587.7753',
+        'Prosopeia personata': '11587.775315',
+        'Eunymphicus cornutus': '11587.77532', 'Eunymphicus cornutus cornutus': '11587.775325',
+        'Eunymphicus cornutus uvaeensis': '11587.77533', 'Cyanoramphus ulietanus': '11587.775335',
+        'Cyanoramphus zealandicus': '11587.77534', 'Cyanoramphus unicolor': '11587.775345',
+        'Cyanoramphus novaezelandiae': '11587.77535', 'Cyanoramphus hochstetteri': '11587.775375',
+        'Cyanoramphus saisseti': '11587.77538', 'Cyanoramphus cookii': '11587.775385',
+        'Cyanoramphus auriceps': '11587.77539',
+        'Cyanoramphus forbesi': '11587.775395', 'Cyanoramphus malherbi': '11587.7754',
+        'Cyanoramphus sp.': '11587.775405',
+        'Barnardius zonarius': '11587.77541', 'Barnardius zonarius semitorquatus': '11587.775415',
+        'Barnardius zonarius zonarius': '11587.77542', 'Barnardius zonarius macgillivrayi': '11587.775455',
+        'Platycercus caledonicus': '11587.77546', 'Platycercus elegans': '11587.775465',
+        'Platycercus elegans [elegans Group]': '11587.77547',
+        'Platycercus elegans [elegans Group] x flaveolus': '11587.775495',
+        'Platycercus elegans adelaidae/subadelaidae': '11587.7755', 'Platycercus venustus': '11587.775515',
+        'Platycercus eximius': '11587.77552', 'Platycercus caledonicus x eximius': '11587.775525',
+        'Platycercus elegans x eximius': '11587.77553', 'Northiella haematogaster': '11587.775575',
+        'Northiella haematogaster haematogaster/pallescens': '11587.77558',
+        'Northiella haematogaster haematorrhous': '11587.775595',
+        'Northiella narethae': '11587.7756', 'Psephotus dissimilis': '11587.775625',
+        'Psephotus chrysopterygius': '11587.77563',
+        'Psephotus pulcherrimus': '11587.775635', 'Purpureicephalus spurius': '11587.77564',
+        'Cyclopsitta gulielmitertii': '11587.775645', 'Cyclopsitta gulielmitertii [melanogenia Group]': '11587.77565',
+        'Psittaculirostris edwardsii': '11587.775775', 'Psittaculirostris salvadorii': '11587.77578',
+        'Melopsittacus undulatus': '11587.77581', 'Melopsittacus undulatus (Domestic type)': '11587.775813',
+        'Charmosyna palmarum': '11587.775835', 'Charmosyna rubrigularis': '11587.77584',
+        'Charmosyna meeki': '11587.775845',
+        'Charmosyna toxopei': '11587.77585', 'Charmosyna multistriata': '11587.775855',
+        'Charmosyna wilhelminae': '11587.77586',
+        'Charmosyna amabilis': '11587.775915', 'Charmosyna margarethae': '11587.77592',
+        'Phigys solitarius': '11587.775985',
+        'Vini australis': '11587.77599', 'Vini kuhlii': '11587.775995', 'Vini stepheni': '11587.776',
+        'Vini peruviana': '11587.776005', 'Vini ultramarina': '11587.77601', 'Lorius domicella': '11587.776115',
+        'Lorius lory': '11587.77612', 'Lorius chlorocercus': '11587.776165', 'Glossopsitta concinna': '11587.77617',
+        'Glossopsitta pusilla': '11587.776175', 'Glossopsitta porphyrocephala': '11587.77618',
+        'Psitteuteles versicolor': '11587.776185', 'Psitteuteles iris': '11587.77619', 'Eos cyanogenia': '11587.776275',
+        'Eos semilarvata': '11587.77628', 'Pseudeos fuscata': '11587.776285', 'Trichoglossus ornatus': '11587.77629',
+        'Trichoglossus haematodus': '11587.776295', 'Trichoglossus haematodus [haematodus Group]': '11587.7763',
+        'Trichoglossus haematodus moluccanus': '11587.776395', 'Trichoglossus haematodus rosenbergii': '11587.7764',
+        'Trichoglossus haematodus weberi': '11587.776405', 'Trichoglossus haematodus rubritorquis': '11587.77641',
+        'Glossopsitta concinna x Trichoglossus haematodus': '11587.776413', 'Trichoglossus euteles': '11587.776415',
+        'Trichoglossus flavoviridis': '11587.77642', 'Trichoglossus johnstoniae': '11587.776435',
+        'Trichoglossus rubiginosus': '11587.77644', 'Trichoglossus chlorolepidotus': '11587.776445',
+        'Trichoglossus haematodus x chlorolepidotus': '11587.776447', 'Psitteuteles/Trichoglossus sp.': '11587.77645',
+        'Zosterops mouroniensis': '23377.00363', 'Zosterops olivaceus': '23377.003632',
+        'Zosterops chloronothos': '23377.003634',
+        'Zosterops borbonicus': '23377.003636', 'Zosterops mauritianus': '23377.003638',
+        'Zosterops senegalensis': '23377.00364',
+        'Zosterops senegalensis stenocricotus': '23377.003642',
+        'Zosterops senegalensis [senegalensis Group]': '23377.003644',
+        'Zosterops poliogastrus kulalensis': '23377.003875', 'Zosterops poliogastrus kikuyuensis': '23377.00388',
+        'Zosterops comorensis': '23377.004075', 'Zosterops maderaspatanus': '23377.00408',
+        'Zosterops kirki': '23377.004175',
+        'Zosterops mayottensis': '23377.004178', 'Zosterops lugubris': '23377.004179',
+        'Zosterops leucophaeus': '23377.00418',
+        'Zosterops explorator/lateralis': '23377.006085', 'Zosterops flavifrons': '23377.00609',
+        'Cyanoderma pyrrhops': '23377.007346', 'Cyanoderma ruficeps': '23377.00735',
+        'Pomatorhinus ferruginosus': '23377.00775',
+        'Pomatorhinus ferruginosus ferruginosus': '23377.007752',
+        'Pomatorhinus ferruginosus phayrei/stanfordi': '23377.007754',
+        'Napothera danjoui danjoui/parvirostris': '23377.010575', 'Napothera danjoui naungmungensis': '23377.010578',
+        'Napothera malacoptila': '23377.010579', 'Napothera pasquieri': '23377.01058',
+        'Napothera albostriata': '23377.010581',
+        'Ptilocichla leucogrammica': '23377.010582', 'Ptilocichla mindanensis': '23377.010583',
+        'Ptilocichla falcata': '23377.010588',
+        'Turdinus abbotti': '23377.010589', 'Alcippe ludlowi': '23377.010955', 'Alcippe brunneicauda': '23377.01096',
+        'Turdoides striata/affinis': '23377.011895', 'Turdoides reinwardtii': '23377.0119',
+        'Garrulax strepitans': '23377.012725',
+        'Garrulax milleti': '23377.01273', 'Garrulax taewanus': '23377.01288',
+        'Garrulax canorus x taewanus': '23377.012883',
+        'Garrulax canorus/taewanus': '23377.012885', 'Garrulax sp.': '23377.01289',
+        'Ianthocincla konkakinhensis': '23377.012985',
+        'Ianthocincla ocellata': '23377.012986', 'Ianthocincla lunulata': '23377.012991',
+        'Ianthocincla bieti': '23377.012992',
+        'Ianthocincla maxima': '23377.012993', 'Ianthocincla pectoralis': '23377.012994',
+        'Garrulax monileger/Ianthocincla pectoralis': '23377.0129995', 'Ianthocincla albogularis': '23377.0129996',
+        'Trochalopteron sp.': '23377.041685', 'Garrulax/Ianthocincla/Trochalopteron sp.': '23377.04169'}
+
+    species = {}
+    subspecies = {}
+    species_codes = {}
+    with open(file_path, 'r', encoding='windows-1252') as f:
+        reader = csv.DictReader(f)
+        fixed_rows = 1
+        for idx, row in enumerate(reader):
+            common_name = row['PRIMARY_COM_NAME']
+            scientific_name = row['SCI_NAME']
+            taxonomic_order = row['TAXON_ORDER']
+            category = row['CATEGORY']
+            parent_code = row['REPORT_AS']
+            species_code = row['SPECIES_CODE']
+            if taxonomic_order in csv_duplicate_fixes.keys():
+                scientific_name = csv_duplicate_fixes[taxonomic_order]
+                print("Fixed scientific name for taxonomic order:", taxonomic_order)
+                fixed_rows += 1
+            if scientific_name in csv_truncated_tax_fixes.keys():
+                bad_taxonomic_order = taxonomic_order
+                taxonomic_order = csv_truncated_tax_fixes[scientific_name]
+                print("Taxonomic order fixed: {} -> {}".format(bad_taxonomic_order, taxonomic_order))
+                fixed_rows += 1
+            # None of these seem to be duplicated, thankfully.
+            species_codes[species_code] = (scientific_name, taxonomic_order)
+            taxa = Decimal(taxonomic_order)
+            # Don't check for existence because these all seem to be properly ordered.
+            parent_scientific_name = None
+            if parent_code != '':
+                parent_scientific_name = species_codes[parent_code][0]
+            if category == "species":
+                species[taxa] = {"common_name": common_name, "scientific_name": scientific_name}
+            else:
+                subspecies[taxa] = {"common_name": common_name, "scientific_name": scientific_name,
+                                    "category": category, "parent_scientific_name": parent_scientific_name}
+        print("Rows fixed:", fixed_rows)
+    return species, subspecies
+
+
+def parsed_taxa_csv_to_db(taxa_csv_file_path):
+    """
+    Creates species and subspecies instances in the database from the eBird taxonomy CSV file, after performing some much needed fixes.
+    Args:
+        taxa_csv_file_path (str):  path of the csv file to open and parse.
+    Returns:
+        Two dictionaries. One of the species instances created in the database, and one of the subspecies instances in the database.
+    """
+    cat = {'issf': 0, 'form': 1, 'domestic': 2, 'slash': 3, 'intergrade': 4, 'spuh': 5, 'hybrid': 6}
+
+    species, subspecies = parse_ebird_taxonomy(taxa_csv_file_path)
+    for k, v in species.items():
+        scientific_name = v['scientific_name']
+        common_name = v['common_name']
+        taxonomic_order = k
+        _ = Species.objects.get_or_create(scientific_name=scientific_name, defaults={'common_name': common_name, 'taxonomic_order': taxonomic_order})
+
+    for k, v in subspecies.items():
+        scientific_name = v['scientific_name']
+        common_name = v['common_name']
+        parent = v['parent_scientific_name']
+        taxonomic_order = k
+        category = cat[v['category']]
+        _ = SubSpecies.objects.get_or_create(scientific_name=scientific_name, defaults={'common_name': common_name, 'taxonomic_order': taxonomic_order, 'parent_species_id': parent, 'category':  category})
+
+
+
+def parse_ebird_dump(file_path, start_row, taxa_csv_path):
     # Caching some common database ids so we don't have to do a SELECT every time we get them.
     taxonomic_order_cache = {}
-    species_category_cache = {}
-    protocol_cache = {}
-    breeding_atlas_code_cache = {}
-    species_cache = {}  # ~10k items.
-    subspecies_cache = {}
     country_code_cache = {}
 
     with open(file_path, 'r') as f:
@@ -109,22 +279,6 @@ def parse_ebird_dump(file_path, start_row):
                     last_edit = None
                 # Start with the models that don't depend on other models and have single attributes.
                 # All of these fields can potentially be blank.
-                fn = TaxonomicOrder.objects.get_or_create
-                kwargs = {'taxonomic_order': taxonomic_order}
-                tax = create_or_cache_or_none(taxonomic_order_cache, fn, kwargs, taxonomic_order)
-
-                fn = SpeciesCategory.objects.get_or_create
-                kwargs = {'category': species_category}
-                spcat = create_or_cache_or_none(species_category_cache, fn, kwargs, species_category)
-
-                fn = Protocol.objects.get_or_create
-                kwargs = {'protocol_type': protocol}
-                proto = create_or_cache_or_none(protocol_cache, fn, kwargs, protocol)
-
-                fn = BreedingAtlas.objects.get_or_create
-                kwargs = {'breeding_atlas_code': breeding_atlas_code}
-                atlas = create_or_cache_or_none(breeding_atlas_code_cache, fn, kwargs, breeding_atlas_code)
-
                 sp = state_lru_cache_stub(state_province, state_code)
 
                 cnty = county_lru_cache_stub(county, county_code)
@@ -143,14 +297,14 @@ def parse_ebird_dump(file_path, start_row):
                 loc, _ = Location.objects.get_or_create(
                     coords=coords, defaults={'locality': local, 'country_id': cntry, 'state_province': sp, 'county': cnty})
 
-                fn = Species.objects.get_or_create
-                kwargs = {'scientific_name': scientific_name, 'defaults': {'common_name': common_name, 'taxonomic_order_id': tax, 'category_id': spcat}}
-                sp = create_or_cache(species_cache, fn, kwargs, scientific_name)
-
-                # SubSpecies depends on Species.
-                fn = SubSpecies.objects.get_or_create
-                kwargs = {'scientific_name': subspecies_scientific_name, 'defaults': {'parent_species_id': sp, 'common_name': subspecies_common_name}}
-                subsp = create_or_cache_or_none(subspecies_cache, fn, kwargs, subspecies_scientific_name)
+                # fn = Species.objects.get_or_create
+                # kwargs = {'scientific_name': scientific_name, 'defaults': {'common_name': common_name, 'taxonomic_order_id': tax, 'category_id': spcat}}
+                # sp = create_or_cache(species_cache, fn, kwargs, scientific_name)
+                #
+                # # SubSpecies depends on Species.
+                # fn = SubSpecies.objects.get_or_create
+                # kwargs = {'scientific_name': subspecies_scientific_name, 'defaults': {'parent_species_id': sp, 'common_name': subspecies_common_name}}
+                # subsp = create_or_cache_or_none(subspecies_cache, fn, kwargs, subspecies_scientific_name)
 
                 # Next the checklist model
                 check, _ = Checklist.objects.get_or_create(
