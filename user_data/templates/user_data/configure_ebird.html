@@ -13,8 +13,16 @@
 
 <form action="{% url 'configure_ebird' %}" method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Fetch from eBird" />
+    {{ url_form }}
+    <input type="submit" name='url' value="Fetch from eBird" />
+</form>
+
+<p>If you have already downloaded the eBird export file, you can upload the ZIP file or CSV file here.</p>
+
+<form action="{% url 'configure_ebird' %}" method="post">
+    {% csrf_token %}
+    {{ file_form }}
+    <input type="submit" name='file' value="Upload eBird export" />
 </form>
 
 {% endblock %}

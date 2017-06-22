@@ -17,29 +17,42 @@ from achievements.models import Achievement, AchievementProgress
 from achievements import calculate
 
 class UploadFileForm(forms.Form):
-    ebirdzip = forms.FileField(label='eBird personal data CSV or ZIP')
+    ebirdzip = forms.FileField(label='eBird export data CSV file or ZIP file')
 
 class UploadURLForm(forms.Form):
-    ebirdurl = forms.URLField(label='URL to eBird export sent in email from eBird')
+    ebirdurl = forms.URLField(
+        label='URL to eBird export sent in email from eBird',
+        widget=forms.TextInput(attrs={'style': 'width: 50%'})
+    )
 
 
 @login_required
 def configure_ebird(request):
+    url_form = UploadURLForm(request.POST or None)
+    file_form = UploadFileForm(request.POST or None)
     if request.method == 'POST':
-        form = UploadURLForm(request.POST)
-        if form.is_valid():
-            response = requests.get(form.cleaned_data['ebirdurl'])
-            stream = io.BytesIO(response.content)
-
-            zfile = zipfile.ZipFile(stream)
-            filestream = zfile.open('MyEBirdData.csv')
+        if url_form.is_valid() or file_form.is_valid():
+            if url_form.is_valid():
+                response = requests.get(url_form.cleaned_data['ebirdurl'])
+                stream = io.BytesIO(response.content)
+                zfile = zipfile.ZipFile(stream)
+                filestream = zfile.open('MyEBirdData.csv')
+            elif file_form.is_valid():
+                uploaded_file = request.FILES['ebirdzip']
+                if uploaded_file.name.endswith('.zip'):
+                    zfile = zipfile.ZipFile(uploaded_file)
+                    filestream = zfile.open('MyEBirdData.csv')
+                elif uploaded_file.name.endswith('.csv'):
+                    filestream = uploaded_file
+                else:
+                    raise TypeError('Must be zip or csv file')
 
             stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
             parse_filestream(stringify, request.user)
             return HttpResponseRedirect(reverse('progress_list'))
-    else:
-        form = UploadURLForm()
-    return render(request, 'user_data/configure_ebird.html', {'form': form})
+
+    return render(request, 'user_data/configure_ebird.html',
+        {'url_form': url_form, 'file_form': file_form})
 
 @login_required
 def upload(request):
