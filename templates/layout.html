@@ -12,8 +12,8 @@
   </head>
   <body>
     <header>
-      <img src="{% static 'logo.png' %}">
-      <h1>Feathers in Your Cap</h1>
+      <a href="{% url 'index' %}"><img src="{% static 'logo.png' %}"></a>
+      <h1><a href="{% url 'index' %}">Feathers in Your Cap</a></h1>
 
       {% if user.is_authenticated %}
       <nav>

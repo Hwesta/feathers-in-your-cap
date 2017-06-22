@@ -514,6 +514,9 @@ header {
     margin: 0;
     margin-left: 1rem;
     font-size: 2em; }
+    header h1 a, header h1 a:hover {
+      text-decoration: none;
+      color: #333; }
   header ul {
     list-style: none;
     display: flex;

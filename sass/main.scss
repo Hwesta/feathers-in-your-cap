@@ -46,6 +46,10 @@ header {
         margin: 0;
         margin-left: 1rem;
         font-size: 2em;
+        a, a:hover {
+            text-decoration: none;
+            color: $dark-grey;
+        }
     }
     ul {
         &#nav {
