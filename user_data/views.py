@@ -13,8 +13,6 @@ from dateutil.parser import parse
 import requests
 
 from . import models
-from achievements.models import Achievement, AchievementProgress
-from achievements import calculate
 
 class UploadFileForm(forms.Form):
     ebirdzip = forms.FileField(label='eBird export data CSV file or ZIP file')
@@ -53,29 +51,6 @@ def configure_ebird(request):
 
     return render(request, 'user_data/configure_ebird.html',
         {'url_form': url_form, 'file_form': file_form})
-
-@login_required
-def upload(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            uploaded_file = request.FILES['ebirdzip']
-
-            if uploaded_file.name.endswith('.zip'):
-                zfile = zipfile.ZipFile(uploaded_file)
-                filestream = zfile.open('MyEBirdData.csv')
-            elif uploaded_file.name.endswith('.csv'):
-                filestream = uploaded_file
-            else:
-                raise TypeError('Must be zip or csv file')
-
-            stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
-            parse_filestream(stringify, request.user)
-            return HttpResponseRedirect('/admin/')
-    else:
-        form = UploadFileForm()
-    return render(request, 'upload_user.html', {'form': form})
-
 
 def parse_filestream(filestream, user):
     # Magic the data into the DB
@@ -131,23 +106,3 @@ def parse_filestream(filestream, user):
                 'breeding_atlas_code': entry['Breeding Code'] or '',
             }
         )
-
-@login_required
-def achievements(request):
-    user = request.user
-    for achievement in Achievement.objects.exclude(achievementprogress__user=user):
-        print(achievement)
-        func = getattr(calculate, achievement.code)
-        level, progress = func(user)
-        print(level, progress)
-        if level > 0 or progress is not None:
-            AchievementProgress.objects.update_or_create(
-                user=user,
-                achievement=achievement,
-                defaults={
-                    'level': level,
-                    'progress': progress,
-                }
-            )
-
-    return HttpResponseRedirect('/admin/achievements/achievementprogress/')
