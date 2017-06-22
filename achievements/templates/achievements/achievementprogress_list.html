@@ -7,6 +7,7 @@
 
 <h2>Your Achievements</h2>
 
+{% if achievement_progress %}
 <div class='achievements-display'>
 {% for progress in achievement_progress%}
   <div class='achievement'>
@@ -21,10 +22,13 @@
       {% endif %}
     </div>
   </div>
-{% empty %}
-  <p>You don't have any achievements yet! Have you <a href="{% url 'configure_ebird' %}">configured access to you eBird data</a>?</p>
 {% endfor %}
 </div>
+{% else %}
+<p>You don't have any achievements yet! Have you <a href="{% url 'configure_ebird' %}">configured access to you eBird data</a>?</p>
+
+<p>If you have, <a href="{% url 'calculate_achievements' %}">calculate your achievements</a>!</p>
+{% endif %}
 
 {% if upcoming_achievements %}
 <h2>Upcoming Achievements </h2>

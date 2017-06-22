@@ -27,7 +27,7 @@
 
       <ul id='login'>
         {% if user.is_authenticated %}
-        <li><a href='#'>Hello, {{ user.get_username }}</a></li>
+        <li>Hello, <a href="{% url 'configure_ebird' %}">{{ user.get_username }}</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
         {% else %}
         <li><a href='#'>Create Account</a></li>
