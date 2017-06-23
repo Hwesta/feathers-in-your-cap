@@ -32,7 +32,7 @@ class Observation(models.Model):
     is_x = models.BooleanField()
     age_sex = models.TextField()  # This is a first pass, this field seems like it's freeform text of structured data.
     species_comments = models.TextField(null=True, blank=True)
-    species = models.ForeignKey('Species')
+    species = models.ForeignKey('Species', null=True, blank=True)
     subspecies = models.ForeignKey('SubSpecies', null=True, blank=True)
     breeding_atlas_code = models.CharField(max_length=2, null=True, blank=True)
     date_last_edit = models.DateTimeField(null=True, blank=True)
@@ -44,8 +44,12 @@ class Observation(models.Model):
             num_obs = 'X'
         else:
             num_obs = self.number_observed
+        if self.species is None:
+            name = self.subspecies.common_name
+        else:
+            name = self.species.common_name
         return "id: {} checklist: {}, {}: {}".format(self.observation, self.checklist.checklist, num_obs,
-                                                     self.species.common_name)
+                                                     name)
 
 
 class Observer(models.Model):
@@ -147,7 +151,11 @@ class SubSpecies(models.Model):
         verbose_name_plural = "Sub Species"
 
     def __str__(self):
-        return "{}: {}, category: {}".format(self.taxonomic_order, self.common_name, self.category)
+        cat = self.CATEGORY_CHOICES[self.category][1]
+        parent = ', no parent.'
+        if self.parent_species is not None:
+            parent = ", parent: {}.".format(self.parent_species)
+        return "{}: {}, category: {}{}".format(self.taxonomic_order, self.common_name, cat, parent)
 
 
 class Location(models.Model):

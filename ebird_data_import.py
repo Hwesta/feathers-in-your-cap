@@ -34,8 +34,8 @@ def parse_ebird_taxonomy(file_path):
             and the values being dictionaries with the common_name and scientific_name.
             Subspecies, A dictionary with the key being a Decimal representation of the taxonomy order id, 
             and the values being dictionaries with the common_name and scientific_name, its category and its parent's scientific name.
-            - spuh, slash, hybrid and intergrade will never have parents, so they will be set to None.
-            - issf will always have a parent.
+            - spuh, issf and hybrid never have parents.
+            - slash and intergrade will always have a parent.
             - form and domestic can both have and not have parents.
 
     """
@@ -170,10 +170,9 @@ def parse_ebird_taxonomy(file_path):
 def parsed_taxa_csv_to_db(taxa_csv_file_path):
     """
     Creates species and subspecies instances in the database from the eBird taxonomy CSV file, after performing some much needed fixes.
+    This creation is idempotent through the use of get_or_create() and can be run multiple times.
     Args:
         taxa_csv_file_path (str):  path of the csv file to open and parse.
-    Returns:
-        Two dictionaries. One of the species instances created in the database, and one of the subspecies instances in the database.
     """
     cat = {'issf': 0, 'form': 1, 'domestic': 2, 'slash': 3, 'intergrade': 4, 'spuh': 5, 'hybrid': 6}
 
@@ -193,17 +192,22 @@ def parsed_taxa_csv_to_db(taxa_csv_file_path):
         _ = SubSpecies.objects.get_or_create(scientific_name=scientific_name, defaults={'common_name': common_name, 'taxonomic_order': taxonomic_order, 'parent_species_id': parent, 'category':  category})
 
 
-
-def parse_ebird_dump(file_path, start_row, taxa_csv_path):
+def parse_ebird_dump(file_path, start_row, taxa_csv_path=None):
     # Caching some common database ids so we don't have to do a SELECT every time we get them.
-    taxonomic_order_cache = {}
     country_code_cache = {}
+    print("Start time:", curr_time())
+    # Creates the species and subspecies entries in the database.
+    if taxa_csv_path is not None:
+        parsed_taxa_csv_to_db(taxa_csv_path)
+        print(curr_time(), "Species and SubSpecies data added to database from taxonomy CSV.")
+
+    species_sci_names = {x.scientific_name for x in Species.objects.all()}
+    subspecies_sci_names = {x.scientific_name for x in SubSpecies.objects.all()}
 
     with open(file_path, 'r') as f:
         # QUOTE_NONE could be dangerous if there are tabs inside a field. For now, this assumes there isn't.
         reader = csv.DictReader(f, delimiter='\t', quoting=csv.QUOTE_NONE)
         count = 0
-        print("Start time:", curr_time())
         err = None
         # This looks crazy, but it's needed for performance reasons. Basically, we batch database updates.
         # This could potentially lead to problems if we need to look up something that hasn't been committed yet, but it seems that the caching takes care of this. This could be a problem, in general.
@@ -230,12 +234,26 @@ def parse_ebird_dump(file_path, start_row, taxa_csv_path):
                 species_comments = row['SPECIES COMMENTS']
                 breeding_atlas_code = row['BREEDING BIRD ATLAS CODE']
                 # Species
-                taxonomic_order = decimal_or_none(row['TAXONOMIC ORDER'])
+                # taxonomic_order = decimal_or_none(row['TAXONOMIC ORDER'])
                 species_category = row['CATEGORY']
-                common_name = row['COMMON NAME']
+                # common_name = row['COMMON NAME']
                 scientific_name = row['SCIENTIFIC NAME']
-                subspecies_common_name = row['SUBSPECIES COMMON NAME']
+                # subspecies_common_name = row['SUBSPECIES COMMON NAME']
                 subspecies_scientific_name = row['SUBSPECIES SCIENTIFIC NAME']
+                if subspecies_scientific_name == '':
+                    subspecies_scientific_name = None
+                # if subspecies_scientific_name == "Fulica americana" or scientific_name == "Fulica americana":
+                #     raise Exception
+                # Conceptually, anything that isn't a 'species' is stored in the the SubSpecies model.
+                # This differs from the ebird data where, for example, 'spuhs' are top-level species.
+                # This is ot massage the data to be more in line with that schema.
+                if species_category in ('spuh', 'slash', 'hybrid'):
+                    subspecies_scientific_name = scientific_name
+                    scientific_name = None
+                elif species_category in ('domestic', 'form'):
+                    if scientific_name in subspecies_sci_names:
+                        subspecies_scientific_name = scientific_name
+                        scientific_name = None
                 # Checklist
                 checklist_date = row['OBSERVATION DATE']
                 checklist_time = row['TIME OBSERVATIONS STARTED']
@@ -252,6 +270,7 @@ def parse_ebird_dump(file_path, start_row, taxa_csv_path):
                 reviewed = bool(int(row['REVIEWED']))
                 reason = row['REASON']
                 protocol = row['PROTOCOL TYPE']
+                proto = protocol_words_to_code(protocol)
                 # Observer
                 # The is is in the form of 'obsr######' but we want just the #s.
                 observer_id = int(row['OBSERVER ID'][4:])
@@ -296,16 +315,6 @@ def parse_ebird_dump(file_path, start_row, taxa_csv_path):
                 # Then continue with the models that only depend on the ones we've got.
                 loc, _ = Location.objects.get_or_create(
                     coords=coords, defaults={'locality': local, 'country_id': cntry, 'state_province': sp, 'county': cnty})
-
-                # fn = Species.objects.get_or_create
-                # kwargs = {'scientific_name': scientific_name, 'defaults': {'common_name': common_name, 'taxonomic_order_id': tax, 'category_id': spcat}}
-                # sp = create_or_cache(species_cache, fn, kwargs, scientific_name)
-                #
-                # # SubSpecies depends on Species.
-                # fn = SubSpecies.objects.get_or_create
-                # kwargs = {'scientific_name': subspecies_scientific_name, 'defaults': {'parent_species_id': sp, 'common_name': subspecies_common_name}}
-                # subsp = create_or_cache_or_none(subspecies_cache, fn, kwargs, subspecies_scientific_name)
-
                 # Next the checklist model
                 check, _ = Checklist.objects.get_or_create(
                     checklist=checklist_id,
@@ -314,16 +323,16 @@ def parse_ebird_dump(file_path, start_row, taxa_csv_path):
                         'duration': duration, 'distance': distance, 'area': area,
                         'number_of_observers': number_of_observers, 'complete_checklist': complete_checklist,
                         'group_id': group_id, 'approved': approved, 'reviewed': reviewed, 'reason': reason,
-                        'protocol_id': proto})
+                        'protocol': proto})
                 # Finally the remaining models that depend on all the previous ones.
                 # We don't care about the result here because get_or_create is being used to be idempotent.
                 _, _ = Observation.objects.get_or_create(
                     observation=observation_id,
                     defaults={
                         'number_observed': number_observed, 'is_x': is_x, 'age_sex': age_sex,
-                        'species_comments': species_comments, 'species_id': sp, 'subspecies_id': subsp,
-                        'breeding_atlas_code_id': atlas, 'date_last_edit': last_edit, 'has_media': has_media,
-                        'checklist': check, 'observer': obs})
+                        'species_comments': species_comments, 'species_id': scientific_name,
+                        'subspecies_id': subspecies_scientific_name, 'breeding_atlas_code': breeding_atlas_code,
+                        'date_last_edit': last_edit, 'has_media': has_media, 'checklist': check, 'observer': obs})
 
                 count += 1
                 if count % COMMIT_BATCH == 0:
@@ -331,9 +340,7 @@ def parse_ebird_dump(file_path, start_row, taxa_csv_path):
                     django.db.transaction.set_autocommit(autocommit=False)
                     dt_stamp = curr_time()
                     print(dt_stamp, "Commit", count)
-                    cache_sizes = "tax: {} category: {} proto: {}  breeding: {} species: {} sub: {} country: {}".format(
-                        len(taxonomic_order_cache), len(species_category_cache), len(protocol_cache),
-                        len(breeding_atlas_code_cache), len(species_cache), len(subspecies_cache), len(country_code_cache))
+                    cache_sizes = "country: {}".format(len(country_code_cache))
                     print(cache_sizes)
                     lru_cache_stats = "state: {}, county: {}, locality: {}, obs: {}".format(
                         state_lru_cache_stub.cache_info(), county_lru_cache_stub.cache_info(),
@@ -478,12 +485,64 @@ def int_or_none(i):
         return int(i)
 
 
+def protocol_words_to_code(protocol):
+    """
+    Converts a protocol in words to the (arbitrary) 2 letter codes in the Django choices field.
+    Args:
+        protocol (str): eEbird textual description of protocol, such as 'Historical'
+    Returns:
+        A two character string that is used as the key for the choices field, for example 'HI'.
+    """
+    conversion = {
+        'Audubon NWR Protocol': 'AU',
+        'BirdLife Australia 20min-2ha survey': 'B2',
+        'BirdLife Australia 500m radius search': 'B5',
+        "Birds 'n' Bogs Survey": 'BB',
+        'California Brown Pelican Survey': 'CB',
+        'Caribbean Martin Survey': 'CM',
+        'Common Birds': 'CB',
+        'GCBO - GCBO Banding Protocol': 'GC',
+        'Great Texas Birding Classic': 'GT',
+        'Historical': 'HI',
+        'IBA Canada (protocol)': 'IB',
+        'My Yard eBird - Standardized Yard Count': 'MY',
+        'Portugal Breeding Bird Atlas': 'PB',
+        'PriMig - Pri Mig Banding Protocol': 'PM',
+        'Protocol name: BirdLife Australia 5 km radius search': 'PN',
+        'RAM--Seabird Census': 'RA',
+        'RMBO Early Winter Waterbird Count': 'RM',
+        'TNC California Waterbird Count': 'TN',
+        'Texas Shorebird Survey': 'TX',
+        'Traveling-Property Specific': 'TP',
+        'eBird - Casual Observation': 'CA',
+        'eBird - Exhaustive Area Count': 'EE',
+        'eBird - Oiled Birds': 'OI',
+        'eBird - Stationary Count': 'ES',
+        'eBird - Traveling Count': 'TR',
+        'eBird California - YellowBilledMagpie General': 'YG',
+        'eBird California - YellowBilledMagpie Traveling': 'YT',
+        'eBird Caribbean - CWC Area Search': 'EC',
+        'eBird Caribbean - CWC Stationary Count': 'ES',
+        'eBird My Yard Count': 'EY',
+        'eBird Pelagic Protocol': 'EP',
+        'eBird Peru--Coastal Shorebird Survey': 'EP',
+        'eBird Random Location Count': 'RA',
+        'eBird Vermont - LoonWatch': 'EV',
+        'eBird--Heron Area Count': 'HA',
+        'eBird--Heron Stationary Count': 'EH',
+        'eBird--Nocturnal Flight Call Count': 'EN',
+        'eBird--Rusty Blackbird Blitz': 'EY'}
+    return conversion[protocol]
+
+
 def parse_command_line():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', dest="input_file", help="Path to ebird datafile.", metavar="INFILE",
                         required=True)
     parser.add_argument('-r', '--row', dest="start_row", help="Start parsing at this row.", metavar="STARTROW",
                         required=False, default=0)
+    parser.add_argument('-c', '--csv', dest="csv_path", help="Path to the ebird taxonomy csv.", metavar="CSVPATH",
+                        required=False, default=None)
     args = parser.parse_args()
     return args
 
@@ -492,4 +551,5 @@ if __name__ == "__main__":
     options = parse_command_line()
     input_file = options.input_file
     start_row = int(options.start_row)
-    parse_ebird_dump(input_file, start_row)
+    csv_path = options.csv_path
+    parse_ebird_dump(input_file, start_row, csv_path)
