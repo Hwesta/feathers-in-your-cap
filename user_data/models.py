@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.contrib.gis.db import models
+from django.utils.translation import ugettext_lazy as _
 
 
 # Static info - this may be moved to ebird data dump app
 
 class Species(models.Model):
     taxonomic_order = models.DecimalField(primary_key=True, decimal_places=10, max_digits=20)
-    category = models.TextField(help_text='species, issf, etc')
+    category = models.TextField(help_text=_('species, issf, etc'))
     scientific_name = models.TextField(unique=True)
     common_name = models.TextField()  # Use eBird names
     ioc_name = models.TextField()
@@ -21,7 +22,7 @@ class Species(models.Model):
 
 class Location(models.Model):
     coords = models.PointField(srid=4326)  # Lon & Lat
-    state_province = models.TextField(help_text='State or province')  # Format: Country-state.  What if this is just the country?
+    state_province = models.TextField(help_text=_('State or province'))  # Format: Country-state.  What if this is just the country?
     county = models.TextField(blank=True)  # County name
     locality = models.TextField(blank=True)  # Location name
 
@@ -42,9 +43,9 @@ class Checklist(models.Model):
     checklist_comments = models.TextField(blank=True)
     number_of_observers = models.PositiveIntegerField(null=True)
     protocol = models.TextField()  # Later, choices?
-    duration = models.DurationField(null=True, help_text='Duration in minutes')
-    distance = models.DecimalField(decimal_places=6, max_digits=16, null=True,help_text='Distance in km')
-    area = models.DecimalField(decimal_places=6, max_digits=16, null=True, help_text='Area covered in ha')
+    duration = models.DurationField(null=True, help_text=_('Duration in minutes'))
+    distance = models.DecimalField(decimal_places=6, max_digits=16, null=True, help_text=_('Distance in km'))
+    area = models.DecimalField(decimal_places=6, max_digits=16, null=True, help_text=_('Area covered in ha'))
 
     def __str__(self):
         return 'Checklist at {s.location.locality} {s.start_date_time}'.format(s=self)

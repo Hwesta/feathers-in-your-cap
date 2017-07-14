@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
@@ -7,32 +8,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>{% block title %}Feathers in Your Cap{% endblock %}</title>
+    <title>{% block title %}{% trans 'Feathers in Your Cap' %}{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'main.css' %}" />
   </head>
   <body>
     <header>
       <a href="{% url 'index' %}"><img src="{% static 'logo.png' %}"></a>
-      <h1><a href="{% url 'index' %}">Feathers in Your Cap</a></h1>
+      <h1><a href="{% url 'index' %}">{% trans 'Feathers in Your Cap' %}</a></h1>
 
       {% if user.is_authenticated %}
       <nav>
         <ul id='nav'>
-          <li><a href="{% url 'progress_list' %}">Achievements</a></li>
-          <li><a href="#">Users</a></li>
-          <li><a href="#">Leaderboard</a></li>
+          <li><a href="{% url 'progress_list' %}">{% trans 'Achievements' %}</a></li>
+          <li><a href="#">{% trans 'Users' %}</a></li>
+          <li><a href="#">{% trans 'Leaderboard' %}</a></li>
         </ul>
       </nav>
       {% endif %}
 
       <ul id='login'>
         {% if user.is_authenticated %}
-        <li>Hello, <a href="{% url 'configure_ebird' %}">{{ user.get_username }}</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% url 'configure_ebird' as configure_ebird_url %}
+        <li>{% blocktrans with username=user.get_username url=configure_ebird_url %}Hello, <a href="{{ url }}">{{ username }}</a>{% endblocktrans %}</li>
+        <li><a href="{% url 'logout' %}">{% trans 'Logout' %}</a></li>
         {% else %}
-        <li><a href='#'>Create Account</a></li>
-        <li><a href="{% url 'login' %}">Log in</a></li>
+        <li><a href='#'>{% trans 'Create Account' %}</a></li>
+        <li><a href="{% url 'login' %}">{% trans 'Log in' %}</a></li>
         {% endif %}
       </ul>
 
@@ -41,6 +43,7 @@
     <main>
       {% block content %}
       <img src="{% static 'logo.png' %}" style='float: right;'>
+      {% blocktrans trimmed %}
       <p>Feathers in your Cap is a birdwatching achievements site powered by eBird.</p>
 
       <p>Birding already has one major achievement: the lifelist! We're just adding a few more. Have you seen all the common birds in your area? How about a bird from every taxonomic order? It's harder than you might think!  How many national birds have you seen in that country?</p>
@@ -50,13 +53,21 @@
       <h3>Why?</h3>
 
       <p>Feathers in your Cap was created by Dale Floer and Holly Becker. We're both video gamers, and soon after we got into birding we knew it was missing something: achievements! Since achievements other than lifelist tracking didn't exist, we decide to create it.</p>
+      {% endblocktrans %}
 
       {% endblock %}
     </main>
 
 
     <footer>
-      <p>Created by <a href='http://hollybecker.net'>Holly Becker</a> and <a href='http://dalefloer.com'>Dale Floer</a>.  Licensed under the <a href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL</a>. Code available on <a href='https://github.com/Hwesta/feathers-in-your-cap/'>GitHub</a></p>
+      {% blocktrans with
+        holly_url='http://hollybecker.net'
+        dale_url='http://dalefloer.com'
+        gpl_url='https://www.gnu.org/licenses/agpl-3.0.html'
+        code_url='https://github.com/Hwesta/feathers-in-your-cap/'
+        trimmed %}
+      <p>Created by <a href='{{ holly_url }}'>Holly Becker</a> and <a href='{{ dale_url }}'>Dale Floer</a>.  Licensed under the <a href='{{ gpl_url }}'>AGPL</a>. Code available on <a href='{{ code_url }}'>GitHub</a></p>
+      {% endblocktrans %}
     </footer>
 
   </body>

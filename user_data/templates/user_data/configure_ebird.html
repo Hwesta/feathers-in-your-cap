@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}{{ block.super}} - Configure access to eBird data{% endblock %}
+{% block title %}{% blocktrans with breadcrumb=block.super%}{{ breadcrumb}} - Configure access to eBird data{% endblocktrans %}{% endblock %}
 
 {% block content %}
 
+{% blocktrans with ebird_url='http://ebird.org' myebird_url='http://ebird.org/ebird/myebird' download_data_url='http://ebird.org/ebird/downloadMyData' trimmed%}
 <h2>Configure access to eBird data</h2>
 
 <p>Unfortunately, eBird does not have an API. To import your data to Feathers in your Cap, you must generate a one-time export from eBird.</p>
@@ -14,28 +16,31 @@
 <p>These instructions will guide you though generating an export.</p>
 
 <ol>
-  <li>Log in to <a href="http://ebird.org">eBird</a>.</li>
-  <li>Go to <a href="http://ebird.org/ebird/myebird">My eBird</a>.</li>
-  <li>In the bottom right corner, click on <a href="http://ebird.org/ebird/downloadMyData">Download my Data</a>.</li>
+  <li>Log in to <a href="{{ ebird_url }}">eBird</a>.</li>
+  <li>Go to <a href="{{ myebird_url }}">My eBird</a>.</li>
+  <li>In the bottom right corner, click on <a href="{{ download_data_url }}">Download my Data</a>.</li>
   <li>Read the description, and click "Submit".</li>
   <li>eBird will send you an email with a link to your eBird data export. The link will look like <code>http://ebird.org/downloads/ebird_2222222222222.zip</code></li>
   <li>Copy and paste the URL from the eBird email into the form below.</li>
 </ol>
+{% endblocktrans %}
 
 <form action="{% url 'configure_ebird' %}" method="post">
     {% csrf_token %}
     {{ url_form }}
-    <input type="submit" name='url' value="Fetch from eBird" />
+    <input type="submit" name='url' value="{% trans 'Fetch from eBird' %}" />
 </form>
 
+{% blocktrans %}
 <h3>I already downloaded the eBird export file</h3>
 
 <p>If you have already downloaded the eBird export file, you can upload the ZIP file or CSV file here instead.</p>
+{% endblocktrans %}
 
 <form action="{% url 'configure_ebird' %}" method="post">
     {% csrf_token %}
     {{ file_form }}
-    <input type="submit" name='file' value="Upload eBird export" />
+    <input type="submit" name='file' value="{% trans 'Upload eBird export' %}" />
 </form>
 
 {% endblock %}

@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 from dateutil.parser import parse
 import requests
@@ -17,15 +19,15 @@ import requests
 from . import models
 
 class UploadFileForm(forms.Form):
-    ebirdzip = forms.FileField(label='eBird export data CSV file or ZIP file')
+    ebirdzip = forms.FileField(label=ugettext_lazy('eBird export data CSV file or ZIP file'))
 
 class UploadURLForm(forms.Form):
     ebirdurl = forms.CharField(
-        label='URL to eBird export sent in email from eBird',
+        label=ugettext_lazy('URL to eBird export sent in email from eBird'),
         widget=forms.URLInput(attrs={'style': 'width: 50%'},),
         validators=[
             URLValidator(schemes=['http', 'https']),
-            RegexValidator(regex=r'https?://ebird\.org/downloads/ebird_\d{10,15}\.zip', message='URL must be for an eBird download'),
+            RegexValidator(regex=r'https?://ebird\.org/downloads/ebird_\d{10,15}\.zip', message=ugettext_lazy('URL must be for an eBird download')),
         ]
     )
 
@@ -49,7 +51,7 @@ def configure_ebird(request):
                 elif uploaded_file.name.endswith('.csv'):
                     filestream = uploaded_file
                 else:
-                    raise TypeError('Must be zip or csv file')
+                    raise TypeError(_('Must be zip or csv file'))
 
             stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
             parse_filestream(stringify, request.user)

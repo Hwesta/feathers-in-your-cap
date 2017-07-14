@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}{{ block.super}} - Achievements{% endblock %}
+{% block title %}{% blocktrans with breadcrumb=block.super%}{{ breadcrumb}} - Achievements{% endblocktrans %}{{ block.super}}{% endblock %}
 
 {% block content %}
 
-<h2>Your Achievements</h2>
+<h2>{% trans 'Your Achievements' %}</h2>
 
 {% if achievement_progress %}
 <div class='achievements-display'>
@@ -14,24 +15,26 @@
     <img src="{% static 'logo.png' %}" height="75px">
     <div>
       <h3>{{ progress.achievement.name }}</h3>
-      <p>This achievement is awesome!</p>
+      <p>{% trans 'This achievement is awesome!' noop %}</p>
       {% if progress.level == 0 %}
-      <p>Only {{ progress.progress }} more needed!</p>
+      <p>{% blocktrans with progress=progress.progress %}Only {{ progress }} more needed!{% endblocktrans %}</p>
       {% elif progress.progress != None %}
-      <p>Level: {{ progress.level }}</p>
+      <p>{% blocktrans with level=progress.level %}Level: {{ level }}{% endblocktrans %}</p>
       {% endif %}
     </div>
   </div>
 {% endfor %}
 </div>
 {% else %}
-<p>You don't have any achievements yet! Have you <a href="{% url 'configure_ebird' %}">configured access to you eBird data</a>?</p>
+{% url 'configure_ebird' as configure_ebird_url %}
+<p>{% blocktrans with url=configure_ebird_url %}You don't have any achievements yet! Have you <a href="{{ url }}">configured access to you eBird data</a>?{% endblocktrans %}</p>
 
-<p>If you have, <a href="{% url 'calculate_achievements' %}">calculate your achievements</a>!</p>
+{% url 'calculate_achievements' as calculate_achievements_url %}
+<p>{% blocktrans with url=calculate_achievements_url %}If you have, <a href="{{ url }}">calculate your achievements</a>!{% endblocktrans %}</p>
 {% endif %}
 
 {% if upcoming_achievements %}
-<h2>Upcoming Achievements </h2>
+<h2>{% trans 'Upcoming Achievements' %}</h2>
 
 <div class='achievements-display'>
 {% for progress in upcoming_achievements%}
@@ -39,8 +42,8 @@
     <img src="{% static 'logo.png' %}" height="75px">
     <div>
       <h3>{{ progress.achievement.name }}</h3>
-      <p>This achievement is awesome!</p>
-      <p>Only {{ progress.progress }} more needed!</p>
+      <p>{% trans 'This achievement is awesome!' noop %}</p>
+      <p>{% blocktrans with progress=progress %}Only {{ progress }} more needed!{% endblocktrans %}</p>
     </div>
   </div>
 {% endfor %}
