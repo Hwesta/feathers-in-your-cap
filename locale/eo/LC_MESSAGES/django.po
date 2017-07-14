@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-14 15:59-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/layout.html:10 templates/layout.html:17
+msgid "Feathers in Your Cap"
+msgstr ""
+
+#: templates/layout.html:22
+msgid "Achievements"
+msgstr ""
+
+#: templates/layout.html:23
+msgid "Users"
+msgstr ""
+
+#: templates/layout.html:24
+msgid "Leaderboard"
+msgstr ""
+
+#: templates/layout.html:32
+#, python-format
+msgid "Hello, <a href=\"%(url)s\">%(username)s</a>"
+msgstr ""
+
+#: templates/layout.html:33
+msgid "Logout"
+msgstr ""
+
+#: templates/layout.html:35
+msgid "Create Account"
+msgstr ""
+
+#: templates/layout.html:36
+msgid "Log in"
+msgstr ""
+
+#: templates/layout.html:45
+msgid ""
+"<p>Feathers in your Cap is a birdwatching achievements site powered by eBird."
+"</p> <p>Birding already has one major achievement: the lifelist! We're just "
+"adding a few more. Have you seen all the common birds in your area? How "
+"about a bird from every taxonomic order? It's harder than you might think!  "
+"How many national birds have you seen in that country?</p> <p>Want to know "
+"what achievements you've earned? Want to know how you compare to your "
+"birding friends? Sign up and find out!</p> <h3>Why?</h3> <p>Feathers in your "
+"Cap was created by Dale Floer and Holly Becker. We're both video gamers, and "
+"soon after we got into birding we knew it was missing something: "
+"achievements! Since achievements other than lifelist tracking didn't exist, "
+"we decide to create it.</p>"
+msgstr ""
+
+#: templates/registration/login.html:4
+#, python-format
+msgid "%(breadcrumb)s - Log in"
+msgstr ""
+
+#: templates/registration/login.html:9
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+
+#: templates/registration/login.html:14
+msgid ""
+"Your account doesn't have access to this page. To proceed, please log in "
+"with an account that has access."
+msgstr ""
+
+#: templates/registration/login.html:16
+msgid "Please log in to see this page."
+msgstr ""
+
+#: templates/registration/login.html:33
+msgid "Log In"
+msgstr ""
