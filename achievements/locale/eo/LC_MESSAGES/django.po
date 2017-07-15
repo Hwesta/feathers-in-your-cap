@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-14 15:59-0700\n"
+"POT-Creation-Date: 2017-07-14 17:40-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +29,11 @@ msgstr ""
 #: achievements/templates/achievements/achievementprogress_list.html:5
 #, python-format
 msgid "%(breadcrumb)s - Achievements"
-msgstr ""
+msgstr "%(breadcrumb)s - Atingoj"
 
 #: achievements/templates/achievements/achievementprogress_list.html:9
 msgid "Your Achievements"
-msgstr ""
+msgstr "Via Atingoj"
 
 #: achievements/templates/achievements/achievementprogress_list.html:18
 #: achievements/templates/achievements/achievementprogress_list.html:45
@@ -57,12 +57,14 @@ msgid ""
 "You don't have any achievements yet! Have you <a href=\"%(url)s\">configured "
 "access to you eBird data</a>?"
 msgstr ""
+"Vi ne havas atingoj ankoraŭ! Ĉu vi <a href=\"%(url)s\">konfiguras eniri al "
+"via eBird informero</a>?"
 
 #: achievements/templates/achievements/achievementprogress_list.html:33
 #, python-format
 msgid "If you have, <a href=\"%(url)s\">calculate your achievements</a>!"
-msgstr ""
+msgstr "Ĉu vi havas, <a href=\"%(url)s\">kalkuli vian atingojn</a>!"
 
 #: achievements/templates/achievements/achievementprogress_list.html:37
 msgid "Upcoming Achievements"
-msgstr ""
+msgstr "Venonta Atingoj"

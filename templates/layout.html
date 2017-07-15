@@ -60,14 +60,24 @@
 
 
     <footer>
-      {% blocktrans with
-        holly_url='http://hollybecker.net'
-        dale_url='http://dalefloer.com'
-        gpl_url='https://www.gnu.org/licenses/agpl-3.0.html'
-        code_url='https://github.com/Hwesta/feathers-in-your-cap/'
-        trimmed %}
-      <p>Created by <a href='{{ holly_url }}'>Holly Becker</a> and <a href='{{ dale_url }}'>Dale Floer</a>.  Licensed under the <a href='{{ gpl_url }}'>AGPL</a>. Code available on <a href='{{ code_url }}'>GitHub</a></p>
-      {% endblocktrans %}
+      <p>{% blocktrans with holly_url='http://hollybecker.net' dale_url='http://dalefloer.com' gpl_url='https://www.gnu.org/licenses/agpl-3.0.html' code_url='https://github.com/Hwesta/feathers-in-your-cap/' trimmed %}
+      Created by <a href='{{ holly_url }}'>Holly Becker</a> and <a href='{{ dale_url }}'>Dale Floer</a>.  Licensed under the <a href='{{ gpl_url }}'>AGPL</a>. Code available on <a href='{{ code_url }}'>GitHub</a>
+      {% endblocktrans %}</p>
+
+      <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+        <input name="next" type="hidden" value="{{ redirect_to }}" />
+        <select name="language">
+        {% get_available_languages as LANGUAGES %}
+        {% get_language_info_list for LANGUAGES as languages %}
+        {% for language in languages %}
+            <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+              {{ language.name_local }} ({{ language.code }})
+            </option>
+          {% endfor %}
+        </select>
+        <input type="submit" value="Go" />
+      </form>
+
     </footer>
 
   </body>

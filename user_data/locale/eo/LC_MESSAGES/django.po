@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-14 15:59-0700\n"
+"POT-Creation-Date: 2017-07-14 17:40-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,13 +41,29 @@ msgstr ""
 #: user_data/templates/user_data/configure_ebird.html:5
 #, python-format
 msgid "%(breadcrumb)s - Configure access to eBird data"
+msgstr "%(breadcrumb)s - Konfiguras eniri al via eBird informero"
+
+#: user_data/templates/user_data/configure_ebird.html:9
+#, python-format
+msgid ""
+"<h2>Configure access to eBird data</h2> <p>Unfortunately, eBird does not "
+"have an API. To import your data to Feathers in your Cap, you must generate "
+"a one-time export from eBird.</p> <h3>I've never done this before</h3> "
+"<p>These instructions will guide you though generating an export.</p> <ol> "
+"<li>Log in to <a href=\"%(ebird_url)s\">eBird</a>.</li> <li>Go to <a href="
+"\"%(myebird_url)s\">My eBird</a>.</li> <li>In the bottom right corner, click "
+"on <a href=\"%(download_data_url)s\">Download my Data</a>.</li> <li>Read the "
+"description, and click \"Submit\".</li> <li>eBird will send you an email "
+"with a link to your eBird data export. The link will look like <code>http://"
+"ebird.org/downloads/ebird_2222222222222.zip</code></li> <li>Copy and paste "
+"the URL from the eBird email into the form below.</li> </ol>"
 msgstr ""
 
-#: user_data/templates/user_data/configure_ebird.html:35
+#: user_data/templates/user_data/configure_ebird.html:31
 msgid "Fetch from eBird"
-msgstr ""
+msgstr "Irprenas pro eBird"
 
-#: user_data/templates/user_data/configure_ebird.html:38
+#: user_data/templates/user_data/configure_ebird.html:34
 msgid ""
 "\n"
 "<h3>I already downloaded the eBird export file</h3>\n"
@@ -56,9 +72,9 @@ msgid ""
 "ZIP file or CSV file here instead.</p>\n"
 msgstr ""
 
-#: user_data/templates/user_data/configure_ebird.html:47
+#: user_data/templates/user_data/configure_ebird.html:43
 msgid "Upload eBird export"
-msgstr ""
+msgstr "Alŝutas eBird eksporton"
 
 #: user_data/views.py:20
 msgid "eBird export data CSV file or ZIP file"

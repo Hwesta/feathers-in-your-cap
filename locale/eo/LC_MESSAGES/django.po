@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-14 15:59-0700\n"
+"POT-Creation-Date: 2017-07-14 17:40-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,40 +18,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/layout.html:10 templates/layout.html:17
+#: templates/layout.html:11 templates/layout.html:18
 msgid "Feathers in Your Cap"
-msgstr ""
-
-#: templates/layout.html:22
-msgid "Achievements"
-msgstr ""
+msgstr "Plumoj en via Ĉapo"
 
 #: templates/layout.html:23
-msgid "Users"
-msgstr ""
+msgid "Achievements"
+msgstr "Atingoj"
 
 #: templates/layout.html:24
-msgid "Leaderboard"
-msgstr ""
+msgid "Users"
+msgstr "Uzuloj"
 
-#: templates/layout.html:32
-#, python-format
-msgid "Hello, <a href=\"%(url)s\">%(username)s</a>"
-msgstr ""
+#: templates/layout.html:25
+msgid "Leaderboard"
+msgstr "Ĉampionejo"
 
 #: templates/layout.html:33
-msgid "Logout"
-msgstr ""
+#, python-format
+msgid "Hello, <a href=\"%(url)s\">%(username)s</a>"
+msgstr "Bonvenon, <a href=\"%(url)s\">%(username)s</a>"
 
-#: templates/layout.html:35
-msgid "Create Account"
-msgstr ""
+#: templates/layout.html:34
+msgid "Logout"
+msgstr "Elsaluti"
 
 #: templates/layout.html:36
-msgid "Log in"
-msgstr ""
+msgid "Create Account"
+msgstr "Registriĝu"
 
-#: templates/layout.html:45
+#: templates/layout.html:37 templates/registration/login.html:29
+msgid "Log in"
+msgstr "Ensaluti"
+
+#: templates/layout.html:46
 msgid ""
 "<p>Feathers in your Cap is a birdwatching achievements site powered by eBird."
 "</p> <p>Birding already has one major achievement: the lifelist! We're just "
@@ -66,25 +66,30 @@ msgid ""
 "we decide to create it.</p>"
 msgstr ""
 
+#: templates/layout.html:63
+#, python-format
+msgid ""
+"Created by <a href='%(holly_url)s'>Holly Becker</a> and <a "
+"href='%(dale_url)s'>Dale Floer</a>.  Licensed under the <a "
+"href='%(gpl_url)s'>AGPL</a>. Code available on <a "
+"href='%(code_url)s'>GitHub</a>"
+msgstr ""
+"Estigis par <a href='%(holly_url)s'>Holly Becker</a> kaj <a "
+"href='%(dale_url)s'>Dale Floer</a>.  Licenciado sub la <a "
+"href='%(gpl_url)s'>AGPL</a>. Kodo havebla sur <a href='%(code_url)s'>GitHub</"
+"a>"
+
 #: templates/registration/login.html:4
 #, python-format
 msgid "%(breadcrumb)s - Log in"
-msgstr ""
+msgstr "%(breadcrumb)s - Ensaluti"
 
 #: templates/registration/login.html:9
 msgid "Your username and password didn't match. Please try again."
 msgstr ""
 
-#: templates/registration/login.html:14
+#: templates/registration/login.html:13
 msgid ""
 "Your account doesn't have access to this page. To proceed, please log in "
 "with an account that has access."
-msgstr ""
-
-#: templates/registration/login.html:16
-msgid "Please log in to see this page."
-msgstr ""
-
-#: templates/registration/login.html:33
-msgid "Log In"
 msgstr ""

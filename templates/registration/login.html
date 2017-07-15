@@ -9,12 +9,8 @@
 <p class='danger'>{% trans "Your username and password didn't match. Please try again." %}</p>
 {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
+{% if next and user.is_authenticated %}
     <p>{% trans "Your account doesn't have access to this page. To proceed, please log in with an account that has access." %}</p>
-    {% else %}
-    <p>{% trans 'Please log in to see this page.' %}</p>
-    {% endif %}
 {% endif %}
 
 <form method="post" action="{% url 'login' %}">
@@ -30,7 +26,7 @@
 </tr>
 </table>
 
-<input type="submit" value="{% trans 'Log In' %}" />
+<input type="submit" value="{% trans 'Log in' %}" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
