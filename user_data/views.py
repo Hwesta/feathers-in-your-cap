@@ -1,4 +1,6 @@
 import csv
+import datetime
+from decimal import Decimal
 import io
 import zipfile
 
@@ -62,8 +64,22 @@ def parse_filestream(filestream, user):
             }
         )
 
+
+        def decimal_or_none(d):
+            if d:
+                return Decimal(d)
+            else:
+                return None
+
         # Checklist
         start = parse(entry['Date'] + ' ' + entry['Time'])
+        if entry['Duration (Min)']:
+            duration = datetime.timedelta(minutes=int(entry['Duration (Min)']))
+        else:
+            duration = None
+
+        distance = decimal_or_none(entry['Distance Traveled (km)'])
+        area = decimal_or_none(entry['Area Covered (ha)'])
         checklist, _ = models.Checklist.objects.get_or_create(
             id=int(entry['Submission ID'][1:]),  # Strip leading S
             user=user,
@@ -74,9 +90,9 @@ def parse_filestream(filestream, user):
                 'checklist_comments': entry['Checklist Comments'] or '',
                 'number_of_observers': entry['Number of Observers'],
                 'protocol': entry['Protocol'],
-                'duration': entry['Duration (Min)'] or '0',
-                'distance': entry['Distance Traveled (km)'] or '0',
-                'area': entry['Area Covered (ha)'] or '0',
+                'duration': duration,
+                'distance': distance,
+                'area': area,
             }
         )
 

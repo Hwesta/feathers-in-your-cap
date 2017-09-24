@@ -1,6 +1,5 @@
-from django.db import models
 from django.conf import settings
-from django.contrib.gis.db import models as gismodels
+from django.contrib.gis.db import models
 
 
 # Static info - this may be moved to ebird data dump app
@@ -20,8 +19,8 @@ class Species(models.Model):
     def __str__(self):
         return '{s.scientific_name} ({s.common_name})'.format(s=self)
 
-class Location(gismodels.Model):
-    coords = gismodels.PointField(srid=4326)  # Lon & Lat
+class Location(models.Model):
+    coords = models.PointField(srid=4326)  # Lon & Lat
     state_province = models.TextField(help_text='State or province')  # Format: Country-state.  What if this is just the country?
     county = models.TextField(blank=True)  # County name
     locality = models.TextField(blank=True)  # Location name
@@ -41,11 +40,11 @@ class Checklist(models.Model):
     complete_checklist = models.BooleanField()
     start_date_time = models.DateTimeField()
     checklist_comments = models.TextField(blank=True)
-    number_of_observers = models.PositiveIntegerField(null=True, blank=True)
+    number_of_observers = models.PositiveIntegerField(null=True)
     protocol = models.TextField()  # Later, choices?
-    duration = models.PositiveIntegerField(help_text='Duration in minutes')
-    distance = models.DecimalField(decimal_places=6, max_digits=16, help_text='Distance in km')
-    area = models.DecimalField(decimal_places=6, max_digits=16, help_text='Area covered in ha')
+    duration = models.DurationField(null=True, help_text='Duration in minutes')
+    distance = models.DecimalField(decimal_places=6, max_digits=16, null=True,help_text='Distance in km')
+    area = models.DecimalField(decimal_places=6, max_digits=16, null=True, help_text='Area covered in ha')
 
     def __str__(self):
         return 'Checklist at {s.location.locality} {s.start_date_time}'.format(s=self)
