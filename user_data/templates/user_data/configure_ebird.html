@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{ block.super}} - Configure access to eBird data{% endblock %}
+
+{% block content %}
+
+<h2>Configure access to eBird data</h2>
+
+<p>Unfortunately, eBird does not have an API. To import your data to Feathers in your Cap, you must generate a one-time export from eBird.</p>
+
+<h3>I've never done this before</h3>
+
+<p>These instructions will guide you though generating an export.</p>
+
+<ol>
+  <li>Log in to <a href="http://ebird.org">eBird</a>.</li>
+  <li>Go to <a href="http://ebird.org/ebird/myebird">My eBird</a>.</li>
+  <li>In the bottom right corner, click on <a href="http://ebird.org/ebird/downloadMyData">Download my Data</a>.</li>
+  <li>Read the description, and click "Submit".</li>
+  <li>eBird will send you an email with a link to your eBird data export. The link will look like <code>http://ebird.org/downloads/ebird_2222222222222.zip</code></li>
+  <li>Copy and paste the URL from the eBird email into the form below.</li>
+</ol>
+
+<form action="{% url 'configure_ebird' %}" method="post">
+    {% csrf_token %}
+    {{ url_form }}
+    <input type="submit" name='url' value="Fetch from eBird" />
+</form>
+
+<h3>I already downloaded the eBird export file</h3>
+
+<p>If you have already downloaded the eBird export file, you can upload the ZIP file or CSV file here instead.</p>
+
+<form action="{% url 'configure_ebird' %}" method="post">
+    {% csrf_token %}
+    {{ file_form }}
+    <input type="submit" name='file' value="Upload eBird export" />
+</form>
+
+{% endblock %}

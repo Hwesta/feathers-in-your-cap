@@ -15,6 +15,7 @@
 @import "base";
 @import "modules";
 
+// Layout
 body {
     box-sizing: border-box;
     background: #75C7F0;
@@ -45,6 +46,10 @@ header {
         margin: 0;
         margin-left: 1rem;
         font-size: 2em;
+        a, a:hover {
+            text-decoration: none;
+            color: $dark-grey;
+        }
     }
     ul {
         &#nav {
@@ -104,5 +109,28 @@ footer {
     p {
         margin: 0;
         padding: 0;
+    }
+}
+
+// Styling
+
+.achievements-display {
+    margin: auto;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+
+.achievement {
+    display: flex;
+    flex-flow: row nowrap;
+    h3 {
+        padding: 0;
+        margin: 0 1rem;
+        font-size: 2rem;
+    }
+    p {
+        padding: 0;
+        margin: 0 1rem;
     }
 }

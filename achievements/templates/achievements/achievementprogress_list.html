@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{ block.super}} - Achievements{% endblock %}
+
+{% block content %}
+
+<h2>Your Achievements</h2>
+
+{% if achievement_progress %}
+<div class='achievements-display'>
+{% for progress in achievement_progress%}
+  <div class='achievement'>
+    <img src="{% static 'logo.png' %}" height="75px">
+    <div>
+      <h3>{{ progress.achievement.name }}</h3>
+      <p>This achievement is awesome!</p>
+      {% if progress.level == 0 %}
+      <p>Only {{ progress.progress }} more needed!</p>
+      {% elif progress.progress != None %}
+      <p>Level: {{ progress.level }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% else %}
+<p>You don't have any achievements yet! Have you <a href="{% url 'configure_ebird' %}">configured access to you eBird data</a>?</p>
+
+<p>If you have, <a href="{% url 'calculate_achievements' %}">calculate your achievements</a>!</p>
+{% endif %}
+
+{% if upcoming_achievements %}
+<h2>Upcoming Achievements </h2>
+
+<div class='achievements-display'>
+{% for progress in upcoming_achievements%}
+  <div class='achievement'>
+    <img src="{% static 'logo.png' %}" height="75px">
+    <div>
+      <h3>{{ progress.achievement.name }}</h3>
+      <p>This achievement is awesome!</p>
+      <p>Only {{ progress.progress }} more needed!</p>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

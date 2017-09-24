@@ -12,20 +12,22 @@
   </head>
   <body>
     <header>
-      <img src="{% static 'logo.png' %}">
-      <h1>Feathers in Your Cap</h1>
+      <a href="{% url 'index' %}"><img src="{% static 'logo.png' %}"></a>
+      <h1><a href="{% url 'index' %}">Feathers in Your Cap</a></h1>
 
+      {% if user.is_authenticated %}
       <nav>
         <ul id='nav'>
-          <li><a href="#">Achievements</a></li>
+          <li><a href="{% url 'progress_list' %}">Achievements</a></li>
           <li><a href="#">Users</a></li>
           <li><a href="#">Leaderboard</a></li>
         </ul>
       </nav>
+      {% endif %}
 
       <ul id='login'>
         {% if user.is_authenticated %}
-        <li><a href='#'>Hello, {{ user.get_username }}</a></li>
+        <li>Hello, <a href="{% url 'configure_ebird' %}">{{ user.get_username }}</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
         {% else %}
         <li><a href='#'>Create Account</a></li>
@@ -37,7 +39,17 @@
 
     <main>
       {% block content %}
-      <p>Feathers in your Cap is a birding achievements site powered by eBird.</p>
+      <img src="{% static 'logo.png' %}" style='float: right;'>
+      <p>Feathers in your Cap is a birdwatching achievements site powered by eBird.</p>
+
+      <p>Birding already has one major achievement: the lifelist! We're just adding a few more. Have you seen all the common birds in your area? How about a bird from every taxonomic order? It's harder than you might think!  How many national birds have you seen in that country?</p>
+
+      <p>Want to know what achievements you've earned? Want to know how you compare to your birding friends? Sign up and find out!</p>
+
+      <h3>Why?</h3>
+
+      <p>Feathers in your Cap was created by Dale Floer and Holly Becker. We're both video gamers, and soon after we got into birding we knew it was missing something: achievements! Since achievements other than lifelist tracking didn't exist, we decide to create it.</p>
+
       {% endblock %}
     </main>
 

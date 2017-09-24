@@ -5,44 +5,58 @@ import io
 import zipfile
 
 from django import forms
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-
+from django.core.validators import RegexValidator, URLValidator
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import Point
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, reverse
 
 from dateutil.parser import parse
+import requests
 
 from . import models
-from achievements.models import Achievement, AchievementProgress
-from achievements import views as achievement_views
 
 class UploadFileForm(forms.Form):
-    ebirdzip = forms.FileField(label='eBird personal data CSV or ZIP')
+    ebirdzip = forms.FileField(label='eBird export data CSV file or ZIP file')
+
+class UploadURLForm(forms.Form):
+    ebirdurl = forms.CharField(
+        label='URL to eBird export sent in email from eBird',
+        widget=forms.URLInput(attrs={'style': 'width: 50%'},),
+        validators=[
+            URLValidator(schemes=['http', 'https']),
+            RegexValidator(regex=r'https?://ebird\.org/downloads/ebird_\d{10,15}\.zip', message='URL must be for an eBird download'),
+        ]
+    )
 
 
 @login_required
-def upload(request):
+def configure_ebird(request):
+    url_form = UploadURLForm(request.POST or None)
+    file_form = UploadFileForm(request.POST or None)
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            uploaded_file = request.FILES['ebirdzip']
-
-            if uploaded_file.name.endswith('.zip'):
-                zfile = zipfile.ZipFile(uploaded_file)
+        if url_form.is_valid() or file_form.is_valid():
+            if url_form.is_valid():
+                response = requests.get(url_form.cleaned_data['ebirdurl'])
+                stream = io.BytesIO(response.content)
+                zfile = zipfile.ZipFile(stream)
                 filestream = zfile.open('MyEBirdData.csv')
-            elif uploaded_file.name.endswith('.csv'):
-                filestream = uploaded_file
-            else:
-                raise TypeError('Must be zip or csv file')
+            elif file_form.is_valid():
+                uploaded_file = request.FILES['ebirdzip']
+                if uploaded_file.name.endswith('.zip'):
+                    zfile = zipfile.ZipFile(uploaded_file)
+                    filestream = zfile.open('MyEBirdData.csv')
+                elif uploaded_file.name.endswith('.csv'):
+                    filestream = uploaded_file
+                else:
+                    raise TypeError('Must be zip or csv file')
 
             stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
             parse_filestream(stringify, request.user)
-            return HttpResponseRedirect('/admin/')
-    else:
-        form = UploadFileForm()
-    return render(request, 'upload_user.html', {'form': form})
+            return HttpResponseRedirect(reverse('progress_list'))
 
+    return render(request, 'user_data/configure_ebird.html',
+        {'url_form': url_form, 'file_form': file_form})
 
 def parse_filestream(filestream, user):
     # Magic the data into the DB
@@ -63,7 +77,6 @@ def parse_filestream(filestream, user):
                 'county': entry['County'],
             }
         )
-
 
         def decimal_or_none(d):
             if d:
@@ -112,16 +125,3 @@ def parse_filestream(filestream, user):
                 'breeding_atlas_code': entry['Breeding Code'] or '',
             }
         )
-
-@login_required
-def achievements(request):
-    user = request.user
-    for achievement in Achievement.objects.exclude(achievementprogress__user=user):
-        print(achievement)
-        func = getattr(achievement_views, achievement.code)
-        rc = func(user)
-        print(rc)
-        if rc > 0:
-            AchievementProgress.objects.get_or_create(user=user, achievement=achievement)
-
-    return HttpResponseRedirect('/admin/achievements/achievementprogress/')

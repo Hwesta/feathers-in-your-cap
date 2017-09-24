@@ -514,6 +514,9 @@ header {
     margin: 0;
     margin-left: 1rem;
     font-size: 2em; }
+    header h1 a, header h1 a:hover {
+      text-decoration: none;
+      color: #333; }
   header ul {
     list-style: none;
     display: flex;
@@ -559,5 +562,22 @@ footer {
   footer p {
     margin: 0;
     padding: 0; }
+
+.achievements-display {
+  margin: auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start; }
+
+.achievement {
+  display: flex;
+  flex-flow: row nowrap; }
+  .achievement h3 {
+    padding: 0;
+    margin: 0 1rem;
+    font-size: 2rem; }
+  .achievement p {
+    padding: 0;
+    margin: 0 1rem; }
 
 /*# sourceMappingURL=main.css.map */

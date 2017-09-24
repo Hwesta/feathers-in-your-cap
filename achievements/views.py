@@ -1,24 +1,41 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, reverse
+from django.views.generic import ListView
 
-from user_data import models as user_models
+from achievements import models
+from achievements import calculate
 
-def canadensis(user):
-    canadensis = user_models.Species.objects.filter(scientific_name__contains='canadensis')
-    count_candensis = canadensis.count()
-    seen = user_models.Observation.objects.filter(user=user, species__in=canadensis).values_list('species__scientific_name', flat=True)
-    seen_count = len(set(seen))
-    # All
-    if seen_count == count_candensis:
-        return 1  # Return seen_count?
-    return 0
 
-def sparrows(user):
+class AchievementProgressList(LoginRequiredMixin, ListView):
+    context_object_name = 'achievement_progress'
 
-    return 0
+    def get_queryset(self):
+        return models.AchievementProgress.objects.filter(user=self.request.user, level__gte=1)
 
-def bb24(user):
-    blackbirds = user_models.Species.objects.filter(common_name__contains='blackbird')
-    # Any
-    if user_models.Observation.objects.filter(user=user, count__gte=24, species__in=blackbirds).exists():
-        return 1
-    return 0
+    def get_context_data(self, **kwargs):
+        context = super(AchievementProgressList, self).get_context_data(**kwargs)
+        # Add some upcoming achievements
+        context['upcoming_achievements'] = models.AchievementProgress.objects.filter(user=self.request.user, level=0, progress__isnull=False)[:3]
+        return context
+
+@login_required
+def calculate_achievements(request):
+    user = request.user
+    print('request user', user)
+    for achievement in models.Achievement.objects.all():
+        print(achievement)
+        func = getattr(calculate, achievement.code)
+        level, progress = func(user)
+        print(level, progress)
+        if level > 0 or progress is not None:
+            models.AchievementProgress.objects.update_or_create(
+                user=user,
+                achievement=achievement,
+                defaults={
+                    'level': level,
+                    'progress': progress,
+                }
+            )
+    return HttpResponseRedirect(reverse('progress_list'))
