@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{% block title %}Feathers in Your Cap{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'main.css' %}" />
+  </head>
+  <body>
+    <header>
+      <img src="{% static 'logo.png' %}">
+      <h1>Feathers in Your Cap</h1>
+
+      <nav>
+        <ul id='nav'>
+          <li><a href="#">Achievements</a></li>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Leaderboard</a></li>
+        </ul>
+      </nav>
+
+      <ul id='login'>
+        {% if user.is_authenticated %}
+        <li><a href='#'>Hello, {{ user.get_username }}</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+        <li><a href='#'>Create Account</a></li>
+        <li><a href="{% url 'login' %}">Log in</a></li>
+        {% endif %}
+      </ul>
+
+    </header>
+
+    <main>
+      {% block content %}
+      <p>Feathers in your Cap is a birding achievements site powered by eBird.</p>
+      {% endblock %}
+    </main>
+
+
+    <footer>
+      <p>Created by <a href='http://hollybecker.net'>Holly Becker</a> and <a href='http://dalefloer.com'>Dale Floer</a>.  Licensed under the <a href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL</a>. Code available on <a href='https://github.com/Hwesta/feathers-in-your-cap/'>GitHub</a></p>
+    </footer>
+
+  </body>
+</html>

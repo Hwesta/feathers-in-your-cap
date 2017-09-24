@@ -1,0 +1,108 @@
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/9/2014
+* Sass Version by Seth Coelen https://github.com/whatsnewsaes
+* Local modifications Copyright 2017 Holly Becker
+*/
+
+/* Base files. */
+@import "variables";
+@import "normalize";
+@import "base";
+@import "modules";
+
+body {
+    box-sizing: border-box;
+    background: #75C7F0;
+    padding-top: 8rem;
+}
+
+header {
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1000;
+    border-bottom: 1px solid $dark-grey;
+    min-height: 6rem;
+    padding: 1rem;
+
+    background: #fff;
+    color: $dark-grey;
+
+    img {
+        height: 2em;
+        float: left;
+    }
+
+    h1 {
+        float: left;
+        margin: 0;
+        margin-left: 1rem;
+        font-size: 2em;
+    }
+    ul {
+        &#nav {
+            float: left;
+        }
+        &#login {
+            float: right;
+        }
+        list-style: none;
+        display: flex;
+        flex-direction: row;
+
+        margin: 0;
+        padding: 0;
+        li {
+            padding: 1rem;
+            margin: 0 1rem;
+            a {
+                text-decoration: none;
+                color: $dark-grey;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+section {
+    box-sizing: border-box;
+    border: 1px solid #ff0;
+}
+
+main {
+    box-sizing: border-box;
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem 2rem;
+
+    border-radius: $global-radius;
+    background: #fff;
+    color: $dark-grey;
+}
+
+footer {
+    box-sizing: border-box;
+    border: 1px solid $dark-grey;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem;
+
+    border-radius: $global-radius;
+    background: #fff;
+    color: $dark-grey;
+
+    font-size: 1rem;
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
+}

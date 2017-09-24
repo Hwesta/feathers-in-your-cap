@@ -53,3 +53,58 @@ Packages required for GIS support:
   * Solution: Achievement updates should be idempotent - create or delete achievement based on currently available data
   * Solution: Warnings that can't handle backfilled data?
   * Solution: Warnings not to add more than 10 checklists at a time because of profile display limitation?
+
+## UI Design
+
+Users:
+* Birders on desktops
+* Birders on phones
+* Birders unfamiliar with video games
+* Birders familiar with video games
+* Birders on slow internet connections
+* Birders on fast internet connections
+* Birders not comfortable with computers
+* Birders that don't speak English
+
+Tasks:
+* Create account
+* Log in
+* Log out
+* Configure access to their eBird data
+* Update their eBird data
+* Look at all accomplished achievements
+* Look at an achievement they have accomplished in detail
+* Look at all achievements available
+* Look at achievements they don't have
+* Look at requirements for achievements they don't have
+* Find another user
+* Look at another user's achievements
+* Compare achievements they have with ones another user has
+* Follow & unfollow another user
+* Look at list of users they follow
+* Look at leaderboard of users they follow
+* Customize the achivement the leaderboard of users they follow is displaying
+* Update privacy settings
+
+Importance & Frequency
+
+| Task                        | Importance | Frequency |
+|-----------------------------|------------|-----------|
+| Create account              | High       | Low       |
+| Log in                      | High       | Medium    |
+| Log out                     | High       | Low       |
+| Config eBird access         | High       | Low       |
+| Update eBird data           | High       | High      |
+| All done achievements       | High       | Medium    |
+| Done achievement detail     | Low        | Low       |
+| All achievements            | Medium     | Medium    |
+| Not done achievements       | High       | High      |
+| Not done achievement detail | High       | High      |
+| Find user                   | Medium     | Medium    |
+| Other user achievements     | Medium     | Low       |
+| Compare achievements        | High       | Medium    |
+| Follow/unfollow user        | Medium     | Low       |
+| List users followed         | Medium     | Low       |
+| Followed users leaderboard  | High       | High      |
+| Customize leaderboard       | High       | Medium    |
+| Update privacy settings     | High       | Low       |
