@@ -1,15 +1,12 @@
 from django.db import models
 from django.conf import settings
-
+from django.contrib.postgres import fields as postgresfields
 
 class Achievement(models.Model):
     name = models.TextField()
-    code = models.TextField()  # Short internal reference code
-    # Name
-    # Long description
-    # Image
-    # Code to check progress
-    # Or this is all outside the DB?
+    code = models.TextField(help_text='Internal reference code. Must also be valid as Python function name')  # Short internal reference code
+    description = models.TextField()
+    extra = postgresfields.JSONField()
 
     def __str__(self):
         return '{s.name} ({s.code})'.format(s=self)
