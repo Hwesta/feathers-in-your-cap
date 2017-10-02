@@ -76,11 +76,11 @@ WSGI_APPLICATION = 'settings.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ['DJANGO_DB'],
+        'USER': os.environ['DJANGO_DB_USER'],
     }
 }
 

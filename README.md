@@ -12,22 +12,34 @@ Because this uses geospatial data, it requires geospatial plugins for you databa
 See Django's [GIS documentation](https://docs.djangoproject.com/en/1.11/ref/contrib/gis/) for more details.
 It has been tested with:
 
-* sqlite & spatialite
+* PostgreSQL & PostGIS
 
 
 ### Arch Linux
-
-Packages required for sqlite:
-
-* sqlite
-* libspatialite
-* python2-pysqlite
 
 Packages required for GIS support:
 
 * geos
 * gdal
 * proj
+
+Packages required for postgres:
+
+* postgres
+* postgis
+
+Set up PostgreSQL & PostGIS
+
+# Configure postgres (from [Arch wiki](https://wiki.archlinux.org/index.php/PostgreSQL))
+#* Switch to postgres user `sudo su postgres`
+#* Initial postgres setup `initdb --locale $LANG -E UTF8 -D '/var/lib/postgres/data'`
+#* Create user in postgres for FIYC `createuser --interactive`
+#* Superuser: no, create databases: yes, create more roles: no
+# Start postgres  `sudo systemctl start postgresql`
+# Create database (as postgres user) `createdb fiyc -U geo`
+# Setup postgis (from [Django docs](https://docs.djangoproject.com/en/1.11/ref/contrib/gis/install/postgis/))
+#* Start postgres shell as postgres user `psql fiyc`
+#* Create postgis extension `CREATE EXTENSION postgis;`
 
 
 ## Anticipated Problems
