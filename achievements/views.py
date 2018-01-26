@@ -27,7 +27,7 @@ def calculate_achievements(request):
     for achievement in models.Achievement.objects.all():
         print(achievement)
         func = getattr(calculate, achievement.code)
-        level, progress = func(user)
+        level, progress = func(user, achievement)
         print(level, progress)
         if level > 0 or progress is not None:
             models.AchievementProgress.objects.update_or_create(

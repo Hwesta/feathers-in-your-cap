@@ -6,12 +6,8 @@ from django.db import migrations
 
 
 def data_migration(apps, schema_editor):
-    Achievement = apps.get_model("achievements", "Achievement")
-    Achievement.objects.bulk_create([
-        Achievement(name='4 and 20 blackbirds', code='bb24'),
-        Achievement(name='Canadian Birder', code='canadensis'),
-        Achievement(name='Sparrower', code='sparrows'),
-    ])
+    # Move to fixtures
+    pass
 
 class Migration(migrations.Migration):
 

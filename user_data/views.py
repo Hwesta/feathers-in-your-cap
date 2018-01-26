@@ -35,21 +35,24 @@ def configure_ebird(request):
     url_form = UploadURLForm(request.POST or None)
     file_form = UploadFileForm(request.POST or None)
     if request.method == 'POST':
-        if url_form.is_valid() or file_form.is_valid():
-            if url_form.is_valid():
-                response = requests.get(url_form.cleaned_data['ebirdurl'])
-                stream = io.BytesIO(response.content)
-                zfile = zipfile.ZipFile(stream)
+        if 'file' in request.POST and file_form.is_valid():
+            uploaded_file = request.FILES['ebirdzip']
+            if uploaded_file.name.endswith('.zip'):
+                zfile = zipfile.ZipFile(uploaded_file)
                 filestream = zfile.open('MyEBirdData.csv')
-            elif file_form.is_valid():
-                uploaded_file = request.FILES['ebirdzip']
-                if uploaded_file.name.endswith('.zip'):
-                    zfile = zipfile.ZipFile(uploaded_file)
-                    filestream = zfile.open('MyEBirdData.csv')
-                elif uploaded_file.name.endswith('.csv'):
-                    filestream = uploaded_file
-                else:
-                    raise TypeError('Must be zip or csv file')
+            elif uploaded_file.name.endswith('.csv'):
+                filestream = uploaded_file
+            else:
+                raise TypeError('Must be zip or csv file')
+            stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
+            parse_filestream(stringify, request.user)
+            return HttpResponseRedirect(reverse('progress_list'))
+
+        if 'url' in request.POST and url_form.is_valid():
+            response = requests.get(url_form.cleaned_data['ebirdurl'])
+            stream = io.BytesIO(response.content)
+            zfile = zipfile.ZipFile(stream)
+            filestream = zfile.open('MyEBirdData.csv')
 
             stringify = io.TextIOWrapper(filestream)  # Open as str not bytes
             parse_filestream(stringify, request.user)

@@ -2,19 +2,21 @@ from user_data import models as user_models
 
 # Achievement Implementations
 
-# Achievements take a user as a parameter, and return the level & progress towards the next level
+# Achievements take a user & the achievement itself as parameters, and return the level & progress towards the next level
 
-def canadensis(user):
-    canadensis = user_models.Species.objects.filter(scientific_name__contains='canadensis')
-    count_candensis = canadensis.count()
+def canadensis(user, achievement):
+    """Species with 'canadensis' as the species name."""
+    canadensis = achievement.extra['species']
+    count_candensis = len(canadensis)
     seen = user_models.Observation.objects.filter(user=user, species__in=canadensis).values_list('species__scientific_name', flat=True)
+    print('seen', seen)
     seen_count = len(set(seen))
     # All
     if seen_count == count_candensis:
         return 1, None
     return 0, seen_count
 
-def sparrows(user):
+def sparrows(user, achievement):
     sparrows = user_models.Species.objects.filter(family__contains='Sparrows', category='species')
     sparrows_count = sparrows.count()
 
@@ -30,7 +32,7 @@ def sparrows(user):
 
     return 0, None
 
-def bb24(user):
+def bb24(user, achievement):
     blackbirds = user_models.Species.objects.filter(common_name__contains='blackbird')
     # Any
     if user_models.Observation.objects.filter(user=user, count__gte=24, species__in=blackbirds).exists():

@@ -1,0 +1,36 @@
+[
+{
+    "model": "achievements.achievement",
+    "pk": 1,
+    "fields": {
+        "name": "4 and 20 blackbirds",
+        "code": "bb24",
+        "description": "Have you seen enough blackbirds to bake into a pie?",
+        "extra": {}
+    }
+},
+{
+    "model": "achievements.achievement",
+    "pk": 2,
+    "fields": {
+        "name": "Canadian Birder",
+        "code": "canadensis",
+        "description": "How Canadian are you? Have you seen all the birds with 'canadensis' in the name?",
+        "extra": {
+            "species": ["Branta canadensis", "Falcipennis canadensis", "Antigone canadensis", "Sakesphorus canadensis", "Perisoreus canadensis", "Sitta canadensis", "Cardellina canadensis", "Caryothraustes canadensis"],
+            "levels": 1,
+            "boundaries": [8]
+        }
+    }
+},
+{
+    "model": "achievements.achievement",
+    "pk": 3,
+    "fields": {
+        "name": "Sparrower",
+        "code": "sparrows",
+        "description": "These LBBs are everyone's favorite.",
+        "extra": {}
+    }
+}
+]
