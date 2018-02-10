@@ -4,21 +4,30 @@ import networkx as nx
 import csv
 import matplotlib.pyplot as plt
 
-def get_genus_species():
-    with open('hollybirds.txt') as f:
+def get_genus_species(name='common'):
+    if name == 'common':
+        filename = 'hollybirds-com.txt'
+    elif name == 'sci':
+        filename = 'hollybirds.txt'
+    with open(filename) as f:
         species = f.readlines()
     species = [s.strip() for s in species]
     return species
 
-def get_order_family():
+def get_order_family(name='common'):
     """Return dict with key=species, value=[family, order]"""
     taxonomy = {}
-    with open('../reference/eBird_Taxonomy_v2016_9Aug2016-from-ods.csv', newline='') as f:
+    with open('../reference/eBird_Taxonomy_v2017_18Aug2017.csv', newline='', encoding='windows-1252') as f:
         csvreader = csv.DictReader(f)
         for row in csvreader:
-            species = row['SCI_NAME']
+            if name == 'common':
+                species = row['PRIMARY_COM_NAME']
+            elif name == 'sci':
+                species = row['SCI_NAME']
             family = row['FAMILY']
-            order = row['ORDER']
+            order = row['ORDER1']
+            if row['CATEGORY'] in ('spuh', 'slash', 'hybrid', 'intergr', 'form'):
+                continue
             taxonomy[species] = [family, order]
 
     return taxonomy
@@ -29,19 +38,16 @@ def main():
 
     G.add_node("Aves")
 
-    species_list = get_genus_species()
-    taxonomy = get_order_family()
-
-    shell1=['Aves']
-    shell2=[]
-    shell3=[]
-    shell4=[]
+    name = 'common'
+    species_list = get_genus_species(name)
+    taxonomy = get_order_family(name)
 
     for species in species_list:
-        family, order = taxonomy[species]
-        shell2.append(order)
-        shell3.append(family)
-        shell4.append(species)
+        try:
+            family, order = taxonomy[species]
+        except KeyError:
+            print('skipping', species)
+            continue
         G.add_edge(species, family)
         G.add_edge(family, order)
         G.add_edge(order, "Aves")
@@ -67,22 +73,15 @@ def main():
     # A.layout('twopi')
     # A.draw("file.png")
 
-    # Using matplotlib & shell
-    # nx.draw_shell(G,
-    #     nlist=[shell1,shell2,shell3,shell4],
-    #     **options
-    # )
-    # plt.show()
-    # plt.savefig('file.png')
-
+    # Using matplotlib & twopi
     pos=nx.nx_agraph.graphviz_layout(G, prog='twopi', args='')
-    plt.figure(figsize=(8,8))
+    plt.figure(figsize=(20,20))
     nx.draw(G,
         pos,
         **options
     ) # node_size=20,alpha=0.5,node_color="blue", with_labels=False)
     plt.axis('equal')
-    # plt.savefig('circular_tree.png')
+    plt.savefig('file.png')
     plt.show()
 
 if __name__ == '__main__':
