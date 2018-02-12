@@ -5,8 +5,8 @@ import csv
 import matplotlib.pyplot as plt
 
 EBIRD_TAXONOMY = '../reference/eBird_Taxonomy_v2017_18Aug2017.csv'
-MY_BIRDS_COMMON = 'hollybirds-com.txt'
-MY_BIRDS_SCI = 'hollybirds.txt'
+MY_BIRDS_COMMON = 'birds-com.txt'
+MY_BIRDS_SCI = 'birds.txt'
 NAMES = 'common'
 
 def get_genus_species(name='common'):
