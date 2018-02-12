@@ -4,11 +4,16 @@ import networkx as nx
 import csv
 import matplotlib.pyplot as plt
 
+EBIRD_TAXONOMY = '../reference/eBird_Taxonomy_v2017_18Aug2017.csv'
+MY_BIRDS_COMMON = 'hollybirds-com.txt'
+MY_BIRDS_SCI = 'hollybirds.txt'
+NAMES = 'common'
+
 def get_genus_species(name='common'):
     if name == 'common':
-        filename = 'hollybirds-com.txt'
+        filename = MY_BIRDS_COMMON
     elif name == 'sci':
-        filename = 'hollybirds.txt'
+        filename = MY_BIRDS_SCI
     with open(filename) as f:
         species = f.readlines()
     species = [s.strip() for s in species]
@@ -17,7 +22,7 @@ def get_genus_species(name='common'):
 def get_order_family(name='common'):
     """Return dict with key=species, value=[family, order]"""
     taxonomy = {}
-    with open('../reference/eBird_Taxonomy_v2017_18Aug2017.csv', newline='', encoding='windows-1252') as f:
+    with open(EBIRD_TAXONOMY, newline='', encoding='windows-1252') as f:
         csvreader = csv.DictReader(f)
         for row in csvreader:
             if name == 'common':
@@ -25,7 +30,10 @@ def get_order_family(name='common'):
             elif name == 'sci':
                 species = row['SCI_NAME']
             family = row['FAMILY']
-            order = row['ORDER1']
+            order = row['ORDER1']  # This might be 'ORDER' in other versions
+
+            # Ignore entries that aren't species.
+            # Keeping 'species', 'issf' (subspecies), 'domestic', even though it might give duplicates, because that might be the only record of that species
             if row['CATEGORY'] in ('spuh', 'slash', 'hybrid', 'intergr', 'form'):
                 continue
             taxonomy[species] = [family, order]
@@ -38,9 +46,8 @@ def main():
 
     G.add_node("Aves")
 
-    name = 'common'
-    species_list = get_genus_species(name)
-    taxonomy = get_order_family(name)
+    species_list = get_genus_species(NAMES)
+    taxonomy = get_order_family(NAMES)
 
     for species in species_list:
         try:
