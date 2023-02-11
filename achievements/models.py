@@ -16,8 +16,8 @@ class Achievement(models.Model):
 
 
 class AchievementProgress(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    achievement = models.ForeignKey('Achievement')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    achievement = models.ForeignKey('Achievement', on_delete=models.CASCADE)
     level = models.IntegerField(help_text='Level of the badge', default=1)
     progress = models.IntegerField(help_text='Progress towards next level', blank=True, null=True, default=None)
 

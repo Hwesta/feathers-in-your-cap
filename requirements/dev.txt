@@ -3,3 +3,9 @@
 django-extensions  # Extensions to Django manage.py
 ipython  # Better REPL
 pygraphviz  # For making models graph
+
+# Dev
+black
+pytest
+isort
+flake8

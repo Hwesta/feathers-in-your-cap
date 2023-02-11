@@ -35,8 +35,8 @@ class Location(models.Model):
 
 class Checklist(models.Model):
     id = models.IntegerField(primary_key=True)  # Strip the leading S off the checklist ID
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    location = models.ForeignKey('Location')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
     complete_checklist = models.BooleanField()
     start_date_time = models.DateTimeField()
     checklist_comments = models.TextField(blank=True)
@@ -51,10 +51,10 @@ class Checklist(models.Model):
 
 
 class Observation(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)  # Not required because checklist has it, but makes queries easier
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Not required because checklist has it, but makes queries easier
     # Personal data doesn't come with the ebird observation ID
-    checklist = models.ForeignKey('Checklist')
-    species = models.ForeignKey('Species')
+    checklist = models.ForeignKey('Checklist', on_delete=models.CASCADE)
+    species = models.ForeignKey('Species', on_delete=models.CASCADE)
     count = models.PositiveIntegerField(null=True)
     presence = models.BooleanField()  # True if count >0 or X
     species_comments = models.TextField()
